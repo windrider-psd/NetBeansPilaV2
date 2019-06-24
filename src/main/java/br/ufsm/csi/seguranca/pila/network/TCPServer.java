@@ -8,8 +8,8 @@ package br.ufsm.csi.seguranca.pila.network;
 import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -23,6 +23,7 @@ import java.util.logging.Logger;
  */
 public class TCPServer implements Runnable
 {
+
    
     private class InputReader implements Runnable
     {
@@ -78,13 +79,17 @@ public class TCPServer implements Runnable
                             
                             byte[] buf = new byte[clientBufferSize];
                             
-                            if(client.getInputStream().read(buf) != 0)
+                            if(client.getInputStream().read(buf) != -1)
                             {
                                 Object object;
                                 try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buf)) {
                                     object = SerializationUtils.DeserializeObject(byteArrayInputStream);
                                 }
-                                System.out.println(object);
+                                catch(StreamCorruptedException ex)
+                                {
+                                    object = new String(buf);
+                                }
+                                
                                 CallObserversMessageReceived(client, object);
                             }
                             
@@ -126,16 +131,17 @@ public class TCPServer implements Runnable
     private Thread thread;
     
     private Set<Socket> clients = new HashSet<>();
-    
+    private int maximumClients;
     private final Set<TCPServerObserver> observers = new HashSet<>();
     private final InputReader inputReader = new InputReader();
     private int clientBufferSize;
     
-    public TCPServer(ServerSocket serverSocket, int clientBufferSize) 
+    public TCPServer(ServerSocket serverSocket, int clientBufferSize, int maximumClients) 
     {
         this.serverSocket = serverSocket;
         this.clientBufferSize = clientBufferSize;
         this.thread = new Thread(this);
+        this.maximumClients = maximumClients;
         
     }
     
@@ -147,12 +153,20 @@ public class TCPServer implements Runnable
             try
             {
                 Socket client = serverSocket.accept();
-                System.out.println("Client connected");
-                synchronized(this.clients)
+                if(clients.size() >= this.maximumClients)
                 {
-                    clients.add(client);
+                    client.close();
                 }
-                CallObserversConnection(client);
+                else
+                {
+                    System.out.println("Client connected");
+                    synchronized(this.clients)
+                    {
+                        clients.add(client);
+                    }
+                    CallObserversConnection(client);
+                }
+                
             }
             catch(Exception ex)
             {

@@ -4,10 +4,13 @@ C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\c
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorageSaver.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\scouting\UserScout.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPServerObserver.java
+C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\node\NodeJSController.java
+C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\node\NodeListener.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\model\User.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\model\Mensagem.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\mining\PilaCoinObserver.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPBroadcasterObserver.java
+C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\node\controllers\UserDataController.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPBroadcaster.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorObserver.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\model\Transacao.java
@@ -25,6 +28,7 @@ C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\c
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\model\Usuario.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\mining\PilaCoinCreator.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorage.java
+C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\node\NodeJSControllerRoute.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinBinaryStorage.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\scouting\UserScoutObserver.java
 C:\Users\politecnico\Documents\NetBeansProjects\pilacoin\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPServer.java

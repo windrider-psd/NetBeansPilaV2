@@ -9,6 +9,10 @@ public class User
     private InetAddress inetAddress;
     private PublicKey publicKey;
 
+    public User() {
+        
+    }
+    
     public User(String id, InetAddress inetAddress, PublicKey publicKey) {
         this.id = id;
         this.inetAddress = inetAddress;

@@ -1,5 +1,6 @@
 package br.ufsm.csi.seguranca;
 
+import br.ufsm.csi.seguranca.node.NodeListener;
 import br.ufsm.csi.seguranca.pila.scouting.UserScout;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 import br.ufsm.csi.seguranca.pila.scouting.MasterScout;
@@ -41,7 +42,7 @@ public class Main
     private static String id;
     private static Usuario usuario;
     
-    private static final int numberOfCreatorThreads = 1;
+    private static final int numberOfCreatorThreads = 3;
     private static final Thread[] pilaCoinCreatorThreads = new Thread[numberOfCreatorThreads];
 
     private static final String certificateFileName = "certificate.per";
@@ -62,6 +63,10 @@ public class Main
     
     public static void main(String[] args) throws Exception
     {
+        
+        
+        
+        NodeListener nodelistener = new NodeListener();
         CreateId();
   
         CreateCertificate();
@@ -112,7 +117,7 @@ public class Main
         ServerSocket serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(getLocalHost(), 0));
         
-        tCPServer = new TCPServer(serverSocket, 5012);
+        tCPServer = new TCPServer(serverSocket, 5012, 99999);
         
         UserScout.getInstance().setId(id);
         
