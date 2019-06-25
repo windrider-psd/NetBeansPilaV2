@@ -22,11 +22,6 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author politecnico
- */
-
 @NodeJSController
 public class UserDataController {
     
@@ -34,7 +29,6 @@ public class UserDataController {
     @NodeJSControllerRoute(CommandPath = "user", OperationType = OperationType.READ)
     public SerializableUser ReadUser() throws JsonProcessingException
     {
-        System.out.println("Reading");
         SerializableUser serializableUser = new SerializableUser();
         serializableUser.setId(Main.thisUser.getId());
         serializableUser.setInetAddress(Main.thisUser.getInetAddress().toString());
@@ -45,7 +39,6 @@ public class UserDataController {
     @NodeJSControllerRoute(CommandPath = "user", OperationType = OperationType.WRITE)
     public void WriteUser(SerializableUser serializableUser)
     {
-        System.out.println("Writing");
         try
         {
             User user = new User();
@@ -64,11 +57,7 @@ public class UserDataController {
         {
             Logger.getLogger(SerializableUser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        catch (InvalidKeySpecException ex)
-        {
-            Logger.getLogger(UserDataController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (UnknownHostException ex)
+        catch (InvalidKeySpecException | UnknownHostException ex)
         {
             Logger.getLogger(UserDataController.class.getName()).log(Level.SEVERE, null, ex);
         }
