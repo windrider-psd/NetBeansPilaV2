@@ -24,162 +24,157 @@ import java.util.logging.Logger;
 public class TCPServer implements Runnable
 {
 
-   
     private class InputReader implements Runnable
     {
-        
+
         private Thread thread;
         private boolean stop = true;
 
-        public InputReader() {
+        public InputReader()
+        {
             this.thread = new Thread(this);
         }
-        
+
         public void Start()
         {
-            synchronized(this)
+            synchronized (this)
             {
                 stop = false;
-                if(!thread.isAlive())
+                if (!thread.isAlive())
                 {
                     thread = new Thread(this);
                     thread.start();
                 }
-                   
+
             }
         }
-        
+
         private void Stop()
         {
-            synchronized(this)
+            synchronized (this)
             {
                 stop = true;
             }
         }
-        
-        public void run() {
-           
-            
-            while(!CheckStop())
+
+        public void run()
+        {
+
+            while (!CheckStop())
             {
                 try
                 {
-                    
-                    synchronized(clients)
+
+                    synchronized (clients)
                     {
                         Set<Socket> closedSockets = new HashSet<>();
-                        for(Socket client : clients)
+                        for (Socket client : clients)
                         {
-                            
-                            if(!client.isConnected())
+
+                            if (!client.isConnected())
                             {
                                 closedSockets.add(client);
                                 continue;
                             }
-                            
+
                             byte[] buf = new byte[clientBufferSize];
-                            
-                            if(client.getInputStream().read(buf) != -1)
+
+                            if (client.getInputStream().read(buf) != -1)
                             {
                                 Object object;
-                                try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buf)) {
+                                try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buf))
+                                {
                                     object = SerializationUtils.DeserializeObject(byteArrayInputStream);
                                 }
-                                catch(StreamCorruptedException ex)
+                                catch (StreamCorruptedException ex)
                                 {
                                     object = new String(buf);
                                 }
-                                
+
                                 CallObserversMessageReceived(client, object);
                             }
-                            
-                            
 
                         }
-                        
-                        for(Socket socket : closedSockets)
+
+                        for (Socket socket : closedSockets)
                         {
                             clients.remove(socket);
                         }
-                        
+
                     }
-                    
+
                     Thread.sleep(1000);
-                    
-                    
+
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ex.printStackTrace();
                 }
             }
         }
-        
+
         private boolean CheckStop()
         {
-            synchronized(this)
+            synchronized (this)
             {
                 return this.stop;
             }
         }
-        
+
     }
-    
+
     private ServerSocket serverSocket;
-    
+
     private boolean stopListening = true;
     private Thread thread;
-    
+
     private Set<Socket> clients = new HashSet<>();
     private int maximumClients;
     private final Set<TCPServerObserver> observers = new HashSet<>();
     private final InputReader inputReader = new InputReader();
     private int clientBufferSize;
-    
-    public TCPServer(ServerSocket serverSocket, int clientBufferSize, int maximumClients) 
+
+    public TCPServer(ServerSocket serverSocket, int clientBufferSize, int maximumClients)
     {
         this.serverSocket = serverSocket;
         this.clientBufferSize = clientBufferSize;
         this.thread = new Thread(this);
         this.maximumClients = maximumClients;
-        
+
     }
-    
-    
+
     @Override
-    public void run() {
-        while(!stopListening)
+    public void run()
+    {
+        while (!stopListening)
         {
             try
             {
                 Socket client = serverSocket.accept();
-                if(clients.size() >= this.maximumClients)
+                if (clients.size() >= this.maximumClients)
                 {
                     client.close();
                 }
                 else
                 {
                     System.out.println("Client connected");
-                    synchronized(this.clients)
+                    synchronized (this.clients)
                     {
                         clients.add(client);
                     }
                     CallObserversConnection(client);
                 }
-                
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 break;
             }
-            
+
         }
         StopListening();
     }
-    
-    
-   
-    
+
     public void SendMessage(Socket client, Object obj) throws IOException
     {
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(client.getOutputStream());
@@ -187,97 +182,104 @@ public class TCPServer implements Runnable
         objectOutputStream.close();
         CallObserversMessageSent(client, obj);
     }
-    
+
     public void StartListening()
     {
         stopListening = false;
-        if(!thread.isAlive())
+        if (!thread.isAlive())
         {
             thread = new Thread(this);
             thread.start();
         }
         inputReader.Start();
-        
+
     }
-    
+
     public void StopListening()
     {
         stopListening = true;
-        synchronized(this.clients)
+        synchronized (this.clients)
         {
-            for(Socket client : clients){
-                try {
+            for (Socket client : clients)
+            {
+                try
+                {
                     client.close();
-                } catch (IOException ex) {
+                }
+                catch (IOException ex)
+                {
                     Logger.getLogger(TCPServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
             clients.clear();
         }
         inputReader.Stop();
-        
+
     }
-    
+
     public void AddObserver(TCPServerObserver observer)
     {
         observers.add(observer);
     }
+
     public void RemoveObserver(TCPServerObserver observer)
     {
         observers.remove(observer);
     }
-    
+
     private void CallObserversConnection(Socket socket)
     {
-        for(TCPServerObserver observer : observers)
+        for (TCPServerObserver observer : observers)
         {
-           observer.OnConnection(socket);
-        }
-    }
-    
-    private void CallObserversMessageReceived(Socket socket, Object message)
-    {
-        for(TCPServerObserver observer : observers)
-        {
-           observer.OnMessageReceived(socket, message);
-        }
-    }
-    
-    private void CallObserversMessageSent(Socket socket, Object message)
-    {
-        for(TCPServerObserver observer : observers)
-        {
-           observer.OnMessageSent(socket, message);
+            observer.OnConnection(socket);
         }
     }
 
-    public ServerSocket getServerSocket() {
+    private void CallObserversMessageReceived(Socket socket, Object message)
+    {
+        for (TCPServerObserver observer : observers)
+        {
+            observer.OnMessageReceived(socket, message);
+        }
+    }
+
+    private void CallObserversMessageSent(Socket socket, Object message)
+    {
+        for (TCPServerObserver observer : observers)
+        {
+            observer.OnMessageSent(socket, message);
+        }
+    }
+
+    public ServerSocket getServerSocket()
+    {
         return serverSocket;
     }
 
-    public void setServerSocket(ServerSocket serverSocket) {
+    public void setServerSocket(ServerSocket serverSocket)
+    {
         this.serverSocket = serverSocket;
     }
 
-    public Set<Socket> getClients() {
+    public Set<Socket> getClients()
+    {
         return clients;
     }
 
-    public void setClients(Set<Socket> clients) {
+    public void setClients(Set<Socket> clients)
+    {
         this.clients = clients;
     }
 
-    public int getClientBufferSize() {
+    public int getClientBufferSize()
+    {
         return clientBufferSize;
     }
 
-    public void setClientBufferSize(int clientBufferSize) {
+    public void setClientBufferSize(int clientBufferSize)
+    {
         this.clientBufferSize = clientBufferSize;
     }
-    
-    
-    
-    
-    
+
 }

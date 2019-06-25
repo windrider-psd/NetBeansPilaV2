@@ -11,7 +11,8 @@ import java.security.PublicKey;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
+public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver
+{
 
     private static MasterScout instance;
     private Set<MasterScoutObserver> observerSet = new HashSet<>();
@@ -19,16 +20,14 @@ public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
 
     private InetAddress masterAddress;
     private int masterPort;
-    
+
     private PublicKey publicKey;
 
-    
-    private MasterScout() {
-      
-        
+    private MasterScout()
+    {
+
     }
 
-    
     public Mensagem CreateMessage(String id, InetAddress inetAddress, PublicKey publicKey, int port)
     {
         Mensagem broadcastMessage = new Mensagem();
@@ -40,19 +39,18 @@ public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
         broadcastMessage.setChavePublica(publicKey);
         return broadcastMessage;
     }
-    
+
     public void AddObserver(MasterScoutObserver masterScoutObserver)
     {
         synchronized (observerSet)
         {
             observerSet.add(masterScoutObserver);
         }
-        if(ready)
+        if (ready)
         {
             masterScoutObserver.OnMasterFound(masterAddress, masterPort);
         }
     }
-
 
     public void RemoveObserver(MasterScoutObserver masterScoutObserver)
     {
@@ -61,30 +59,30 @@ public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
             observerSet.remove(masterScoutObserver);
         }
     }
-    
+
     public static MasterScout getInstance()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = new MasterScout();
         }
         return instance;
     }
-    
+
     private void CallObservers()
     {
         synchronized (observerSet)
         {
-            if(this.ready)
+            if (this.ready)
             {
-                for(MasterScoutObserver masterScoutObserver : observerSet)
+                for (MasterScoutObserver masterScoutObserver : observerSet)
                 {
-                     masterScoutObserver.OnMasterFound(this.masterAddress, this.masterPort);
+                    masterScoutObserver.OnMasterFound(this.masterAddress, this.masterPort);
                 }
             }
             else
             {
-                for(MasterScoutObserver masterScoutObserver : observerSet)
+                for (MasterScoutObserver masterScoutObserver : observerSet)
                 {
                     masterScoutObserver.OnMasterError();
                 }
@@ -98,53 +96,59 @@ public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
         return message.getTipo() == Mensagem.TipoMensagem.DISCOVER_RESP && message.isMaster();
     }
 
-    private void setReady(boolean ready) {
+    private void setReady(boolean ready)
+    {
         this.ready = ready;
 
         CallObservers();
     }
 
-    public PublicKey getPublicKey() {
+    public PublicKey getPublicKey()
+    {
         return publicKey;
     }
 
-    public void setPublicKey(PublicKey publicKey) {
+    public void setPublicKey(PublicKey publicKey)
+    {
         this.publicKey = publicKey;
     }
 
     @Override
-    public void OnPacket(DatagramPacket datagramPacket) {
-        
+    public void OnPacket(DatagramPacket datagramPacket)
+    {
+
         try
         {
             byte[] data = datagramPacket.getData();
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
             Mensagem mensagem = (Mensagem) SerializationUtils.DeserializeObject(byteArrayInputStream);
             byteArrayInputStream.close();
-            
-            if(ValidateServer(mensagem))
+
+            if (ValidateServer(mensagem))
             {
                 this.masterAddress = mensagem.getEndereco();
                 this.masterPort = mensagem.getPorta();
-                if(!ready)
+                if (!ready)
                 {
                     setReady(true);
                 }
 
             }
-            else if(ready) {
+            else if (ready)
+            {
                 setReady(false);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            
+
         }
-        
+
     }
 
     @Override
-    public void OnMessageSent(DatagramPacket datagramPacket) {
+    public void OnMessageSent(DatagramPacket datagramPacket)
+    {
         System.out.println("A message has been sent to master");
     }
 }

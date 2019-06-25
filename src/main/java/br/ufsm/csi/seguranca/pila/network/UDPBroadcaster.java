@@ -19,82 +19,82 @@ import java.util.Set;
  *
  * @author politecnico
  */
-public class UDPBroadcaster implements Runnable{
-    
+public class UDPBroadcaster implements Runnable
+{
+
     private DatagramSocket datagramSocket;
     private Object defaultBroadcastMessage;
     private InetAddress broadcastAddress;
     private int broadcastPort;
     private int interval;
-    
+
     private byte[] serializedBroadcastMessage = new byte[1];
     private Thread thread;
-    private boolean stop = true;  
-    
-    
+    private boolean stop = true;
+
     private Set<UDPBroadcasterObserver> observers = new HashSet<>();
-   
-    public UDPBroadcaster(DatagramSocket datagramSocket, Object broadcastMessage, InetAddress broadcastAddress, int broadcastPort, int interval) throws SocketException {
+
+    public UDPBroadcaster(DatagramSocket datagramSocket, Object broadcastMessage, InetAddress broadcastAddress, int broadcastPort, int interval) throws SocketException
+    {
         this.defaultBroadcastMessage = broadcastMessage;
         this.broadcastAddress = broadcastAddress;
         this.broadcastPort = broadcastPort;
         this.interval = interval;
-        
+
         this.datagramSocket = datagramSocket;
         this.datagramSocket.setBroadcast(true);
         setSerializedBroadcastMessage();
         thread = new Thread(this);
     }
-    
+
     public synchronized void Start()
     {
-        if(!thread.isAlive())
+        if (!thread.isAlive())
         {
             thread.start();
         }
-        
+
         stop = false;
     }
-    
+
     public synchronized void Stop()
     {
         stop = true;
     }
-    
-   
-    
+
     @Override
-    public void run() 
+    public void run()
     {
-        while(!stop)
-        {       
+        while (!stop)
+        {
             try
             {
-                synchronized(this.serializedBroadcastMessage){
+                synchronized (this.serializedBroadcastMessage)
+                {
                     BroadcastSingle(serializedBroadcastMessage, true);
                 }
-                
-                
+
                 Thread.sleep(interval);
             }
-            catch(InterruptedException ex){
+            catch (InterruptedException ex)
+            {
                 ex.printStackTrace();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.printStackTrace();
                 break;
             }
         }
     }
-    
+
     public void BroadcastSingle(byte[] buffer, boolean callObservers) throws IOException
     {
         DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, broadcastAddress, broadcastPort);
         datagramSocket.send(datagramPacket);
         CallObservers(datagramPacket);
     }
-    
+
     public void BroadcastSingle(Object object, boolean callObservers) throws IOException
     {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -104,88 +104,98 @@ public class UDPBroadcaster implements Runnable{
         BroadcastSingle(buffer, callObservers);
     }
 
-    public int getInterval() {
+    public int getInterval()
+    {
         return interval;
     }
 
-    public void setInterval(int interval) {
+    public void setInterval(int interval)
+    {
         this.interval = interval;
     }
 
-   
-    public DatagramSocket getDatagramSocket() {
+    public DatagramSocket getDatagramSocket()
+    {
         return datagramSocket;
     }
 
-    public void setDatagramSocket(DatagramSocket datagramSocket) {
+    public void setDatagramSocket(DatagramSocket datagramSocket)
+    {
         this.datagramSocket = datagramSocket;
     }
 
-    private void setSerializedBroadcastMessage() {
-        synchronized(this.serializedBroadcastMessage)
+    private void setSerializedBroadcastMessage()
+    {
+        synchronized (this.serializedBroadcastMessage)
         {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            try {
+            try
+            {
                 SerializationUtils.SerializeObject(defaultBroadcastMessage, byteArrayOutputStream);
                 serializedBroadcastMessage = byteArrayOutputStream.toByteArray();
                 byteArrayOutputStream.close();
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }
 
-        
     }
 
-    public Object getDefaultBroadcastMessage() {
+    public Object getDefaultBroadcastMessage()
+    {
         return defaultBroadcastMessage;
     }
 
-    public void setDefaultBroadcastMessage(Object defaultBroadcastMessage) {
+    public void setDefaultBroadcastMessage(Object defaultBroadcastMessage)
+    {
         this.defaultBroadcastMessage = defaultBroadcastMessage;
     }
-    
-    
 
-    public InetAddress getBroadcastAddress() {
+    public InetAddress getBroadcastAddress()
+    {
         return broadcastAddress;
     }
 
-    public void setBroadcastAddress(InetAddress broadcastAddress) {
+    public void setBroadcastAddress(InetAddress broadcastAddress)
+    {
         this.broadcastAddress = broadcastAddress;
     }
 
-    public int getBroadcastPort() {
+    public int getBroadcastPort()
+    {
         return broadcastPort;
     }
 
-    public void setBroadcastPort(int broadcastPort) {
+    public void setBroadcastPort(int broadcastPort)
+    {
         this.broadcastPort = broadcastPort;
     }
-    
+
     public void AddObserver(UDPBroadcasterObserver observer)
     {
         observers.add(observer);
     }
-    
+
     public void RemoveObserver(UDPBroadcasterObserver observer)
     {
         observers.remove(observer);
     }
-    
+
     private void CallObservers(DatagramPacket datagramPacket)
     {
-        this.observers.forEach((observer) -> {
-            try{
+        this.observers.forEach((observer) ->
+        {
+            try
+            {
                 observer.OnMessageSent(datagramPacket);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                
+
             }
         });
     }
-    
-    
-    
+
 }

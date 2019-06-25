@@ -17,22 +17,22 @@ import java.net.Socket;
  *
  * @author politecnico
  */
-
 @NodeJSController
-public class UserDataController {
-    
+public class UserDataController
+{
+
     User user = new User();
-    
+
     @NodeJSControllerRoute(Command = "user", OperationType = OperationType.READ)
     public User ReadUser() throws JsonProcessingException
     {
         return user;
     }
+
     @NodeJSControllerRoute(Command = "user", OperationType = OperationType.WRITE)
     public void WriteUser(User user)
     {
         this.user = user;
     }
-    
-    
+
 }

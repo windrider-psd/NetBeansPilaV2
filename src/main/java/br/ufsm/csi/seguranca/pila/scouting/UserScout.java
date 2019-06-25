@@ -19,29 +19,34 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
 {
 
     private String id;
-    
+
     @Override
-    public void OnPacket(DatagramPacket datagramPacket) {
-        try {
+    public void OnPacket(DatagramPacket datagramPacket)
+    {
+        try
+        {
             System.out.println("User scouting message has been received");
-            
+
             byte[] data = datagramPacket.getData();
             Mensagem mensagem;
-            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data)) {
+            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data))
+            {
                 mensagem = (Mensagem) SerializationUtils.DeserializeObject(byteArrayInputStream);
             }
-            
-            if(IsValidMessage(mensagem))
+
+            if (IsValidMessage(mensagem))
             {
                 System.out.println("Found user: " + mensagem.getIdOrigem());
                 User user = new User(mensagem.getIdOrigem(), mensagem.getEndereco(), mensagem.getChavePublica());
                 CallObservers(user);
             }
-        } catch (IOException | ClassNotFoundException ex) {
+        }
+        catch (IOException | ClassNotFoundException ex)
+        {
             Logger.getLogger(UserScout.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private static UserScout instance;
 
     private Set<UserScoutObserver> userScoutObserverSet = new HashSet<>();
@@ -49,7 +54,7 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
     public UserScout()
     {
     }
-    
+
     public Mensagem CreateMessage(String id, InetAddress inetAddress, PublicKey publicKey, int port)
     {
         Mensagem broadcastMessage = new Mensagem();
@@ -62,11 +67,11 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
         return broadcastMessage;
     }
 
-    public  static UserScout getInstance()
+    public static UserScout getInstance()
     {
         try
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = new UserScout();
             }
@@ -77,7 +82,6 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
             return null;
         }
     }
-
 
     public void AddObserver(UserScoutObserver userScoutObserver)
     {
@@ -91,8 +95,10 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
 
     private void CallObservers(User user)
     {
-        for (UserScoutObserver u : userScoutObserverSet) {
-            try {
+        for (UserScoutObserver u : userScoutObserverSet)
+        {
+            try
+            {
                 u.OnUserFound(user);
             }
             catch (Exception ex)
@@ -101,21 +107,23 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
             }
         }
     }
+
     private boolean IsValidMessage(Mensagem message)
-    {        
+    {
         return !message.getIdOrigem().equals(id) && message.getTipo() == Mensagem.TipoMensagem.DISCOVER
                 && message.getIdOrigem() != null && message.isMaster() == false
                 && message.getEndereco() != null && message.getChavePublica() != null;
     }
 
     @Override
-    public void OnMessageSent(DatagramPacket datagramPacket) {
+    public void OnMessageSent(DatagramPacket datagramPacket)
+    {
         System.out.println("A broadcast message has been sent to users");
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
-    
-    
+
 }

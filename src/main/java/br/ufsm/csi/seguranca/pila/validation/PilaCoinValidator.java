@@ -24,7 +24,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PilaCoinValidator implements Runnable, MasterScoutObserver {
+public class PilaCoinValidator implements Runnable, MasterScoutObserver
+{
 
     private PilaCoin pilaCoin;
     private InetSocketAddress socketAddress;
@@ -35,7 +36,8 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
     private boolean ready = false;
 
     @Override
-    public void run() {
+    public void run()
+    {
 
         try
         {
@@ -59,7 +61,6 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
             }
             //----------------------------------
 
-
             // - Serializar o pila e criptografá-lo com a chave de sessão.
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             SerializationUtils.SerializeObject(pilaCoin, byteArrayOutputStream);
@@ -74,7 +75,6 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
             }
             //---------------------------------------------
 
-
             //Assinatura
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] pilaHash = digest.digest(pilaBytes);
@@ -88,8 +88,6 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
             }
 
             //----------
-
-
             ObjetoTroca objetoTroca = new ObjetoTroca();
             objetoTroca.setChaveSessao(secretKeyEncryptedBytes);
             objetoTroca.setObjetoSerializadoCriptografado(encodedPilaBytes);
@@ -97,15 +95,12 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
             objetoTroca.setChavePublica(PersonalCertificate.getInstance().getPublicKey());
 
             //cipher.init(Cipher.DECRYPT_MODE, PersonalCertificate.getInstance().getPublicKey());
-           // byte[] hashAssinatura = cipher.doFinal(objetoTroca.getAssinatura());
-
-            
+            // byte[] hashAssinatura = cipher.doFinal(objetoTroca.getAssinatura());
             while (!ready)
             {
             }
 
             //System.out.println("Creating socket: " + masterInetAddress.toString() + ":" + masterPort);
-            
             Socket socket = new Socket(masterInetAddress, masterPort);
 
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -123,7 +118,7 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
             BigInteger bigInteger = new BigInteger(1, pilaHash);
             System.out.println(bigInteger.compareTo(new BigInteger("99999998000000000000000000000000000000000000000000000000000000000000000000")) < 0);*/
 
-            ObjetoTroca masterObjetoTroca = (ObjetoTroca)object;
+            ObjetoTroca masterObjetoTroca = (ObjetoTroca) object;
 
             byte[] cryptoObject = masterObjetoTroca.getObjetoSerializadoCriptografado();
             byte[] masterPilaBytes;
@@ -136,7 +131,7 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
 
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(masterPilaBytes);
             PilaCoin validatedPilaCoin = (PilaCoin) SerializationUtils.DeserializeObject(byteArrayInputStream);
-            
+
             /*
             
             ByteArrayOutputStream validatedOS = new ByteArrayOutputStream();
@@ -154,7 +149,6 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
                 hashValidatedSignature = cipherRSA.doFinal(validatedSignature);
             }
             System.out.println(Arrays.equals(validatedPilaHash, hashValidatedSignature));*/
-            
             this.pilaCoin.setId(validatedPilaCoin.getId());
             this.pilaCoin.setTransacoes(validatedPilaCoin.getTransacoes());
             this.CallObservers();
@@ -178,37 +172,40 @@ public class PilaCoinValidator implements Runnable, MasterScoutObserver {
 
     protected void CallObservers()
     {
-        for(PilaCoinValidatorObserver pilaCoinValidatorObserver : observers)
+        for (PilaCoinValidatorObserver pilaCoinValidatorObserver : observers)
         {
             pilaCoinValidatorObserver.OnPilaCoinValidatorReady(this);
         }
     }
 
-    public PilaCoin getPilaCoin() {
+    public PilaCoin getPilaCoin()
+    {
         return pilaCoin;
     }
 
-    public void setPilaCoin(PilaCoin pilaCoin) {
+    public void setPilaCoin(PilaCoin pilaCoin)
+    {
         this.pilaCoin = pilaCoin;
     }
 
-
-
     @Override
-    public void OnMasterFound(InetAddress inetAddress, int port) {
+    public void OnMasterFound(InetAddress inetAddress, int port)
+    {
         this.masterInetAddress = inetAddress;
         this.masterPort = port;
         ready = true;
     }
 
     @Override
-    public void OnMasterError() {
+    public void OnMasterError()
+    {
         ready = false;
         this.masterInetAddress = null;
         this.masterPort = -1;
     }
 
-    public PilaCoinValidator() {
+    public PilaCoinValidator()
+    {
         MasterScout.getInstance().AddObserver(this);
 
     }

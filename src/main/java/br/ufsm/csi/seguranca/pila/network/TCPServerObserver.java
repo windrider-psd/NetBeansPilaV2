@@ -11,8 +11,12 @@ import java.net.Socket;
  *
  * @author politecnico
  */
-public interface TCPServerObserver {
+public interface TCPServerObserver
+{
+
     void OnMessageReceived(Socket socket, Object obj);
+
     void OnMessageSent(Socket socket, Object obj);
+
     void OnConnection(Socket client);
 }

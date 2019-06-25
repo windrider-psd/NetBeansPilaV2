@@ -2,7 +2,8 @@ package br.ufsm.csi.seguranca.pila.Serialization;
 
 import java.io.*;
 
-public class SerializationUtils {
+public class SerializationUtils
+{
 
     public static void SerializeObject(Object object, OutputStream outputStream) throws IOException
     {
@@ -11,11 +12,11 @@ public class SerializationUtils {
         objectOutputStream.close();
     }
 
-    public static Object DeserializeObject(InputStream inputStream) throws  IOException, ClassNotFoundException
+    public static Object DeserializeObject(InputStream inputStream) throws IOException, ClassNotFoundException
     {
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         Object object = objectInputStream.readObject();
         objectInputStream.close();
-        return  object;
+        return object;
     }
 }

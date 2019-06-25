@@ -11,6 +11,8 @@ import java.net.DatagramPacket;
  *
  * @author politecnico
  */
-public interface UDPListenerObserver {
+public interface UDPListenerObserver
+{
+
     void OnPacket(DatagramPacket datagramPacket);
 }

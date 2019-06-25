@@ -6,13 +6,16 @@ br\ufsm\csi\seguranca\pila\model\Usuario.class
 br\ufsm\csi\seguranca\pila\network\UDPBroadcasterObserver.class
 br\ufsm\csi\seguranca\pila\scouting\MasterScout.class
 br\ufsm\csi\seguranca\pila\scouting\UserScout.class
+br\ufsm\csi\seguranca\node\controllers\UserDataController.class
 br\ufsm\csi\seguranca\pila\model\ObjetoTroca.class
 br\ufsm\csi\seguranca\pila\model\MensagemFragmentada.class
 br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorageSaver.class
 br\ufsm\csi\seguranca\pila\scouting\MasterScoutObserver.class
 br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorage.class
+br\ufsm\csi\seguranca\node\NodeJSController.class
 br\ufsm\csi\seguranca\pilacoin\PilaDHTClient.class
 br\ufsm\csi\seguranca\pila\network\TCPServer$InputReader.class
+br\ufsm\csi\seguranca\node\NodeJSControllerRoute.class
 br\ufsm\csi\seguranca\pila\network\UDPListenerObserver.class
 br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorManager.class
 br\ufsm\csi\seguranca\pila\scouting\UserScoutObserver.class
@@ -28,7 +31,10 @@ br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorManagerObserver.class
 br\ufsm\csi\seguranca\pila\validation\PilaCoinValidator.class
 br\ufsm\csi\seguranca\pila\model\PersonalCertificate.class
 br\ufsm\csi\seguranca\pila\mining\PilaCoinObserver.class
+br\ufsm\csi\seguranca\node\NodeListener$Route.class
+br\ufsm\csi\seguranca\node\OperationType.class
 br\ufsm\csi\seguranca\pila\network\UDPBroadcaster.class
+br\ufsm\csi\seguranca\node\NodeListener.class
 br\ufsm\csi\seguranca\pila\mining\PilaCoinCreator.class
 br\ufsm\csi\seguranca\pila\model\Mensagem$TipoMensagem.class
 br\ufsm\csi\seguranca\pila\Serialization\PilaCoinBinaryStorage.class

@@ -8,7 +8,8 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PilaCoinBinaryStorage implements PilaCoinStorage {
+public class PilaCoinBinaryStorage implements PilaCoinStorage
+{
 
     private String filePath;
     private File pilaCoinFile;
@@ -23,7 +24,7 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
         this.autoSave = autoSave;
 
         this.pilaCoinFile = new File(filePath);
-        if(!this.pilaCoinFile.exists())
+        if (!this.pilaCoinFile.exists())
         {
             this.Save();
         }
@@ -36,14 +37,14 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     {
         synchronized (this)
         {
-            if(pilaCoinSet.contains(pilaCoin))
+            if (pilaCoinSet.contains(pilaCoin))
             {
-                return  false;
+                return false;
             }
             else
             {
                 pilaCoinSet.add(pilaCoin);
-                if(autoSave)
+                if (autoSave)
                 {
                     return this.Save();
                 }
@@ -53,12 +54,13 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     }
 
     @Override
-    public boolean Remove(PilaCoin pilaCoin) {
+    public boolean Remove(PilaCoin pilaCoin)
+    {
         synchronized (this)
         {
-            if(pilaCoinSet.remove(pilaCoin))
+            if (pilaCoinSet.remove(pilaCoin))
             {
-                if(autoSave)
+                if (autoSave)
                 {
                     return this.Save();
                 }
@@ -72,15 +74,17 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     }
 
     @Override
-    public boolean Update(PilaCoin pilaCoin) {
+    public boolean Update(PilaCoin pilaCoin)
+    {
         PilaCoin p = this.Get(pilaCoin.getId());
 
-        if(p != null)
+        if (p != null)
         {
             this.pilaCoinSet.remove(p);
             this.pilaCoinSet.add(pilaCoin);
 
-            if(this.autoSave){
+            if (this.autoSave)
+            {
                 this.Save();
             }
             return true;
@@ -93,10 +97,12 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     }
 
     @Override
-    public int Remove(PilaCoin[] pilaCoins) {
+    public int Remove(PilaCoin[] pilaCoins)
+    {
         int total = 0;
-        for (PilaCoin p : pilaCoinSet) {
-            if(this.Remove(p))
+        for (PilaCoin p : pilaCoinSet)
+        {
+            if (this.Remove(p))
             {
                 total++;
             }
@@ -105,10 +111,12 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     }
 
     @Override
-    public PilaCoin Get(Long id) {
+    public PilaCoin Get(Long id)
+    {
         PilaCoin pilaCoin = null;
-        for (PilaCoin p : pilaCoinSet) {
-            if(p.getId() == id)
+        for (PilaCoin p : pilaCoinSet)
+        {
+            if (p.getId() == id)
             {
                 pilaCoin = p;
                 break;
@@ -118,17 +126,20 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     }
 
     @Override
-    public boolean Contains(PilaCoin pilaCoin) {
+    public boolean Contains(PilaCoin pilaCoin)
+    {
         return false;
     }
 
     @Override
-    public PilaCoin[] Get(Long[] ids) {
+    public PilaCoin[] Get(Long[] ids)
+    {
         Set<PilaCoin> foundSet = new HashSet<>();
 
-        for (Long id : ids) {
+        for (Long id : ids)
+        {
             PilaCoin pilaCoin = this.Get(id);
-            if(pilaCoin != null)
+            if (pilaCoin != null)
             {
                 foundSet.add(pilaCoin);
             }
@@ -138,15 +149,18 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     }
 
     @Override
-    public PilaCoin[] GetAll() {
+    public PilaCoin[] GetAll()
+    {
         return this.pilaCoinSet.toArray(new PilaCoin[this.pilaCoinSet.size()]);
     }
 
     @Override
-    public int Clear() {
+    public int Clear()
+    {
 
         int total = this.pilaCoinSet.size();
-        for (PilaCoin p: this.pilaCoinSet) {
+        for (PilaCoin p : this.pilaCoinSet)
+        {
         }
         this.pilaCoinSet.clear();
 
@@ -157,7 +171,8 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
 
     public boolean Save()
     {
-        try {
+        try
+        {
             synchronized (this)
             {
                 FileOutputStream fileOutputStream = new FileOutputStream(this.pilaCoinFile);
@@ -177,7 +192,8 @@ public class PilaCoinBinaryStorage implements PilaCoinStorage {
     {
         synchronized (this)
         {
-            try {
+            try
+            {
                 FileInputStream fileInputStream = new FileInputStream(this.pilaCoinFile);
                 this.pilaCoinSet = (Set<PilaCoin>) SerializationUtils.DeserializeObject(fileInputStream);
                 fileInputStream.close();

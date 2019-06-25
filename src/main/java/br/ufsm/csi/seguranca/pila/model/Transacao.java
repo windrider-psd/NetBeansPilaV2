@@ -6,7 +6,8 @@ import java.util.Date;
 /**
  * Created by cpol on 17/04/2018.
  */
-public class Transacao implements Serializable {
+public class Transacao implements Serializable
+{
 
     private static final long serialVersionUID = 1L;
 
@@ -14,27 +15,33 @@ public class Transacao implements Serializable {
     private Date dataTransacao;
     private byte[] assinaturaDono;
 
-    public String getIdNovoDono() {
+    public String getIdNovoDono()
+    {
         return idNovoDono;
     }
 
-    public void setIdNovoDono(String idNovoDono) {
+    public void setIdNovoDono(String idNovoDono)
+    {
         this.idNovoDono = idNovoDono;
     }
 
-    public Date getDataTransacao() {
+    public Date getDataTransacao()
+    {
         return dataTransacao;
     }
 
-    public void setDataTransacao(Date dataTransacao) {
+    public void setDataTransacao(Date dataTransacao)
+    {
         this.dataTransacao = dataTransacao;
     }
 
-    public byte[] getAssinaturaDono() {
+    public byte[] getAssinaturaDono()
+    {
         return assinaturaDono;
     }
 
-    public void setAssinaturaDono(byte[] assinaturaDono) {
+    public void setAssinaturaDono(byte[] assinaturaDono)
+    {
         this.assinaturaDono = assinaturaDono;
     }
 }

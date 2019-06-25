@@ -16,7 +16,10 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface NodeJSControllerRoute {
+public @interface NodeJSControllerRoute
+{
+
     public String Command() default "";
+
     public OperationType OperationType() default OperationType.READ;
 }

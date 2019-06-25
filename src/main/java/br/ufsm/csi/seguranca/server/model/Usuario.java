@@ -6,33 +6,40 @@ import java.security.PublicKey;
 /**
  * Created by cpol on 19/04/2018.
  */
-public class Usuario {
+public class Usuario
+{
 
     private String id;
     private PublicKey chavePublica;
     private InetAddress endereco;
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
 
-    public PublicKey getChavePublica() {
+    public PublicKey getChavePublica()
+    {
         return chavePublica;
     }
 
-    public void setChavePublica(PublicKey chavePublica) {
+    public void setChavePublica(PublicKey chavePublica)
+    {
         this.chavePublica = chavePublica;
     }
 
-    public InetAddress getEndereco() {
+    public InetAddress getEndereco()
+    {
         return endereco;
     }
 
-    public void setEndereco(InetAddress endereco) {
+    public void setEndereco(InetAddress endereco)
+    {
         this.endereco = endereco;
     }
 }
