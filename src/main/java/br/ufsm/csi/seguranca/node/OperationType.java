@@ -9,7 +9,6 @@ package br.ufsm.csi.seguranca.node;
  *
  * @author politecnico
  */
-public enum OperationType
-{
+public enum OperationType {
     READ, WRITE
 }

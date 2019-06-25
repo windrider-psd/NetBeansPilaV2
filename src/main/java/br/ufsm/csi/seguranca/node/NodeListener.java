@@ -5,7 +5,9 @@
  */
 package br.ufsm.csi.seguranca.node;
 
+import br.ufsm.csi.seguranca.Main;
 import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
+import br.ufsm.csi.seguranca.pila.model.User;
 import br.ufsm.csi.seguranca.pila.network.TCPServer;
 import br.ufsm.csi.seguranca.pila.network.TCPServerObserver;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,7 +44,19 @@ public class NodeListener implements TCPServerObserver
     @Override
     public void OnMessageReceived(Socket socket, Object obj)
     {
-        InvokeRoutes("user", OperationType.READ, "{\"id\":\"afaf\",\"inetAddress\":null,\"publicKey\":null}");
+        if(obj instanceof String)
+        {
+            try
+            {
+                ObjectMapper objectMapper = new ObjectMapper();
+                NodeJSCommand nodeJSCommand = objectMapper.readValue((String) obj, NodeJSCommand.class);
+                InvokeRoutes(nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());   
+            }
+            catch(IOException ex)
+            {
+                System.out.println("Invalid Command: " + ex.getMessage());
+            }
+        }
     }
 
     @Override
@@ -55,147 +69,9 @@ public class NodeListener implements TCPServerObserver
     public void OnConnection(Socket client)
     {
         this.socket = client;
-
     }
 
-    private class Route
-    {
-
-        private Method method;
-        private Object instance;
-
-        public Route(Method method, Object instance)
-        {
-            this.method = method;
-            this.instance = instance;
-            this.method.setAccessible(true);
-        }
-
-        public Object InvokeRoute(Object arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(boolean arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(byte arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(short arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(int arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(float arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(long arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Object InvokeRoute(double arg) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
-        {
-            int count = method.getParameterCount();
-            if (count == 0)
-            {
-                return this.method.invoke(instance);
-            }
-            else
-            {
-                return this.method.invoke(instance, arg);
-            }
-        }
-
-        public Method getMethod()
-        {
-            return method;
-        }
-
-        public void setMethod(Method method)
-        {
-            this.method = method;
-        }
-
-        public Object getInstance()
-        {
-            return instance;
-        }
-
-        public void setInstance(Object instance)
-        {
-            this.instance = instance;
-        }
-
-    }
+    
 
     private Map< String, Map< OperationType, Set< Route>>> routeMapMap = new HashMap<>();
     private static Map< String, Class> builtInMap = new HashMap< String, Class>();
@@ -217,22 +93,22 @@ public class NodeListener implements TCPServerObserver
     private boolean caseSentitiveCommands;
     private TCPServer tcpServer;
 
-    public NodeListener()
+    public NodeListener(String packageName)
     {
 
         try
         {
-            SetUpRoutes("br.ufsm.csi.seguranca.node.controllers");
+            SetUpRoutes(packageName);
             this.tcpServer = new TCPServer(new ServerSocket(42228), 5012, 1);
             this.tcpServer.AddObserver(this);
             this.tcpServer.StartListening();
-
-        }
-        catch (IOException ex)
+            
+            
+        } catch (IOException ex)
         {
             Logger.getLogger(NodeListener.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }   
 
     private void SetUpRoutes(String packageName)
     {
@@ -240,12 +116,16 @@ public class NodeListener implements TCPServerObserver
         {
             Set<Class> classes = new HashSet<>(Arrays.asList(getClasses(packageName)));
 
-            classes.stream().filter(c
-                    ->
+            classes.stream().filter(c ->
             {
+                System.out.println("-----------");
+                System.out.println(c);
+               
                 Annotation[] annotations = c.getAnnotations();
+                 System.out.println(annotations.length);
                 for (Annotation annotation : annotations)
                 {
+                    System.out.println(annotation);
                     if (annotation.annotationType().equals(NodeJSController.class))
                     {
                         return true;
@@ -259,8 +139,7 @@ public class NodeListener implements TCPServerObserver
                 Object instance = c.newInstance();
                 Set<Method> methods = new HashSet<>(Arrays.asList(c.getMethods()));
 
-                methods = methods.stream().filter(method
-                        ->
+                methods = methods.stream().filter(method ->
                 {
                     Annotation annotation = method.getAnnotation(NodeJSControllerRoute.class);
                     Parameter[] parameters = method.getParameters();
@@ -278,7 +157,7 @@ public class NodeListener implements TCPServerObserver
 
                     NodeJSControllerRoute nodeJSControllerRoute = method.getAnnotation(NodeJSControllerRoute.class);
 
-                    String command = nodeJSControllerRoute.Command();
+                    String command = nodeJSControllerRoute.CommandPath();
                     if (!caseSentitiveCommands)
                     {
                         command = command.toLowerCase();
@@ -301,8 +180,7 @@ public class NodeListener implements TCPServerObserver
 
             }
 
-        }
-        catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | SecurityException ex)
+        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | SecurityException ex)
         {
             ex.printStackTrace();
         }
@@ -328,8 +206,7 @@ public class NodeListener implements TCPServerObserver
                     if (route.getMethod().getParameterCount() == 0)
                     {
                         returnedValue = route.InvokeRoute(arg);
-                    }
-                    else if (isValidJSON(arg))
+                    } else if (isValidJSON(arg))
                     {
                         Parameter parameter = route.getMethod().getParameters()[0];
                         if (!parameter.getType().isPrimitive())
@@ -340,15 +217,14 @@ public class NodeListener implements TCPServerObserver
                             {
                                 obj = objectMapper.readValue(arg, parameter.getType());
                             }
-                            catch (Exception ex)
+                            catch(Exception ex)
                             {
                                 continue;
                             }
                             returnedValue = route.InvokeRoute(obj);
 
                         }
-                    }
-                    else
+                    } else
                     {
                         Parameter parameter = route.getMethod().getParameters()[0];
 
@@ -360,110 +236,93 @@ public class NodeListener implements TCPServerObserver
                                 {
                                     boolean value = Boolean.parseBoolean(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(byte.class))
+                                } else if (parameter.getType().equals(byte.class))
                                 {
                                     byte value = Byte.parseByte(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(short.class))
+                                } else if (parameter.getType().equals(short.class))
                                 {
                                     short value = Short.parseShort(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(int.class))
+                                } else if (parameter.getType().equals(int.class))
                                 {
                                     int value = Integer.parseInt(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(long.class))
+                                } else if (parameter.getType().equals(long.class))
                                 {
                                     long value = Long.parseLong(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(float.class))
+                                } else if (parameter.getType().equals(float.class))
                                 {
                                     float value = Float.parseFloat(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(double.class))
+                                } else if (parameter.getType().equals(double.class))
                                 {
                                     double value = Double.parseDouble(arg);
                                     returnedValue = route.InvokeRoute(value);
                                 }
-                            }
-                            else if (IsFromPrimitive(parameter.getType()))
+                            } else if (IsFromPrimitive(parameter.getType()))
                             {
                                 if (parameter.getType().equals(Boolean.class))
                                 {
                                     Boolean value = Boolean.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(Byte.class))
+                                } else if (parameter.getType().equals(Byte.class))
                                 {
                                     Byte value = Byte.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(Short.class))
+                                } else if (parameter.getType().equals(Short.class))
                                 {
                                     Short value = Short.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(Integer.class))
+                                } else if (parameter.getType().equals(Integer.class))
                                 {
                                     Integer value = Integer.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(Long.class))
+                                } else if (parameter.getType().equals(Long.class))
                                 {
                                     Long value = Long.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(Float.class))
+                                } else if (parameter.getType().equals(Float.class))
                                 {
                                     Float value = Float.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
-                                }
-                                else if (parameter.getType().equals(Double.class))
+                                } else if (parameter.getType().equals(Double.class))
                                 {
                                     Double value = Double.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
                                 }
-                            }
-                            else if (parameter.getType().equals(String.class))
+                            } else if (parameter.getType().equals(String.class))
                             {
                                 returnedValue = route.InvokeRoute(arg);
-                            }
-                            else
+                            } else
                             {
                                 continue;
                             }
-                        }
-                        catch (Exception ex)
+                        } catch (Exception ex)
                         {
                             continue;
                         }
                     }
-
+                    
                     if (returnedValue != null && socket != null && operationType == OperationType.READ)
                     {
                         byte[] bytes;
                         if (returnedValue.getClass().isPrimitive() || IsFromPrimitive(returnedValue.getClass()))
                         {
-                            bytes = returnedValue.toString().getBytes();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            SerializationUtils.SerializeObject(returnedValue.toString(), byteArrayOutputStream);
+                            bytes = byteArrayOutputStream.toByteArray();
 
-                        }
-                        else
+                        } else
                         {
                             ObjectMapper mapper = new ObjectMapper();
                             String json = mapper.writeValueAsString(returnedValue);
-
                             bytes = json.getBytes();
                         }
                         socket.getOutputStream().write(bytes);
                     }
-                }
-                catch (Exception ex)
+                } catch (Exception ex)
                 {
                     ex.printStackTrace();
                 }
@@ -489,8 +348,7 @@ public class NodeListener implements TCPServerObserver
             final ObjectMapper mapper = new ObjectMapper();
             JsonNode jnode = mapper.readTree(json);
             return jnode.fields().hasNext();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             return false;
         }
@@ -530,8 +388,7 @@ public class NodeListener implements TCPServerObserver
             {
                 assert !file.getName().contains(".");
                 classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            }
-            else if (file.getName().endsWith(".class"))
+            } else if (file.getName().endsWith(".class"))
             {
                 classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
             }

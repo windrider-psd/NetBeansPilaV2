@@ -9,19 +9,17 @@ import br.ufsm.csi.seguranca.pila.model.PilaCoin;
 import java.net.InetAddress;
 import java.util.*;
 
-public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValidatorObserver, MasterScoutObserver
-{
+public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValidatorObserver, MasterScoutObserver {
 
     private Set<PilaCoinValidatorManagerObserver> observers = new HashSet<>();
     private static PilaCoinValidatorManager instance;
-
+    
     private Set<PilaCoinValidator> pilaCoinValidators = new HashSet<>();
     private Set<PilaCoin> scheduledPilaCoins = new HashSet<>();
-
+    
     private boolean ready = false;
-
-    private PilaCoinValidatorManager()
-    {
+    
+    private PilaCoinValidatorManager(){
 
     }
 
@@ -30,14 +28,14 @@ public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValid
         PilaCoinCreator.AddCreationObserver(this);
     }
 
-    public void StopValidation()
+    public  void StopValidation()
     {
         PilaCoinCreator.RemoveCreationObserver(this);
     }
 
     public static synchronized PilaCoinValidatorManager getInstance()
     {
-        if (instance == null)
+        if(instance == null)
         {
             instance = new PilaCoinValidatorManager();
         }
@@ -58,68 +56,66 @@ public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValid
 
     private void CallManagerObservers(PilaCoin pilaCoin)
     {
-        for (PilaCoinValidatorManagerObserver pilaCoinValidatorManagerObserver : this.observers)
+        for(PilaCoinValidatorManagerObserver pilaCoinValidatorManagerObserver : this.observers)
         {
             pilaCoinValidatorManagerObserver.OnFinishedValidation(pilaCoin);
         }
     }
 
+    
     @Override
-    public void OnCreatedPilaCoin(PilaCoinCreator pilaCoinCreator, PilaCoin pilaCoin)
-    {
+    public void OnCreatedPilaCoin(PilaCoinCreator pilaCoinCreator, PilaCoin pilaCoin) {
 
-        if (this.ready)
+        
+        if(this.ready)
         {
-            ValidatePilaCoin(pilaCoin);
+            ValidatePilaCoin(pilaCoin);    
         }
         else
         {
             scheduledPilaCoins.add(pilaCoin);
         }
-
+        
     }
 
     @Override
-    public void OnPilaCoinValidatorReady(PilaCoinValidator pilaCoinValidator)
-    {
+    public void OnPilaCoinValidatorReady(PilaCoinValidator pilaCoinValidator) {
         System.out.println("Valid: " + pilaCoinValidator.getPilaCoin().getNumeroMagico());
         CallManagerObservers(pilaCoinValidator.getPilaCoin());
     }
 
     @Override
-    public void OnMasterFound(InetAddress inetAddress, int port)
-    {
-        setReady(true);
+    public void OnMasterFound(InetAddress inetAddress, int port) {
+       setReady(true);
     }
 
     @Override
-    public void OnMasterError()
-    {
+    public void OnMasterError() {
         setReady(false);
     }
-
+    
     private void setReady(boolean value)
     {
         this.ready = value;
-
-        if (value == true)
+        
+        if(value == true)
         {
             CallScheduledPilaCoins();
         }
     }
-
+    
     private void CallScheduledPilaCoins()
     {
-        for (PilaCoin p : this.scheduledPilaCoins)
+        for(PilaCoin p : this.scheduledPilaCoins)
         {
             ValidatePilaCoin(p);
         }
     }
-
+    
     private void ValidatePilaCoin(PilaCoin pilaCoin)
     {
         this.scheduledPilaCoins.remove(pilaCoin);
-
+        
         PilaCoinValidator pilaCoinValidator = new PilaCoinValidator();
         pilaCoinValidator.setPilaCoin(pilaCoin);
         Thread thread = new Thread(pilaCoinValidator);

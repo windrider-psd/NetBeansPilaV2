@@ -11,8 +11,6 @@ import java.net.DatagramPacket;
  *
  * @author politecnico
  */
-public interface UDPBroadcasterObserver
-{
-
+public interface UDPBroadcasterObserver {
     void OnMessageSent(DatagramPacket datagramPacket);
 }

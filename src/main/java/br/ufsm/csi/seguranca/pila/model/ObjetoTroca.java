@@ -6,8 +6,7 @@ import java.security.PublicKey;
 /**
  * Created by cpol on 17/04/2018.
  */
-public class ObjetoTroca implements Serializable
-{
+public class ObjetoTroca implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,43 +15,35 @@ public class ObjetoTroca implements Serializable
     private byte[] objetoSerializadoCriptografado;
     private byte[] assinatura;
 
-    public PublicKey getChavePublica()
-    {
+    public PublicKey getChavePublica() {
         return chavePublica;
     }
 
-    public void setChavePublica(PublicKey chavePublica)
-    {
+    public void setChavePublica(PublicKey chavePublica) {
         this.chavePublica = chavePublica;
     }
 
-    public byte[] getChaveSessao()
-    {
+    public byte[] getChaveSessao() {
         return chaveSessao;
     }
 
-    public void setChaveSessao(byte[] chaveSessao)
-    {
+    public void setChaveSessao(byte[] chaveSessao) {
         this.chaveSessao = chaveSessao;
     }
 
-    public byte[] getObjetoSerializadoCriptografado()
-    {
+    public byte[] getObjetoSerializadoCriptografado() {
         return objetoSerializadoCriptografado;
     }
 
-    public void setObjetoSerializadoCriptografado(byte[] objetoSerializadoCriptografado)
-    {
+    public void setObjetoSerializadoCriptografado(byte[] objetoSerializadoCriptografado) {
         this.objetoSerializadoCriptografado = objetoSerializadoCriptografado;
     }
 
-    public byte[] getAssinatura()
-    {
+    public byte[] getAssinatura() {
         return assinatura;
     }
 
-    public void setAssinatura(byte[] assinatura)
-    {
+    public void setAssinatura(byte[] assinatura) {
         this.assinatura = assinatura;
     }
 }

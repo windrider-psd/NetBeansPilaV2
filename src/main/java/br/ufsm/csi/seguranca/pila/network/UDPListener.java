@@ -15,98 +15,88 @@ import java.util.Set;
  *
  * @author politecnico
  */
-public class UDPListener implements Runnable
-{
-
+public class UDPListener implements Runnable{
     private DatagramSocket datagramSocket;
     private int bufferSize;
-
+    
     private Thread thread;
     private boolean stop = false;
-
+    
     private Set<UDPListenerObserver> observers = new HashSet<>();
-
-    public UDPListener(DatagramSocket datagramSocket, int bufferSize)
-    {
+    
+    public UDPListener(DatagramSocket datagramSocket, int bufferSize) {
         this.datagramSocket = datagramSocket;
         this.bufferSize = bufferSize;
         this.thread = new Thread(this);
     }
 
-    public DatagramSocket getDatagramSocket()
-    {
+    public DatagramSocket getDatagramSocket() {
         return datagramSocket;
     }
 
-    public void setDatagramSocket(DatagramSocket datagramSocket)
-    {
+    public void setDatagramSocket(DatagramSocket datagramSocket) {
         this.datagramSocket = datagramSocket;
     }
 
-    public int getBufferSize()
-    {
+    public int getBufferSize() {
         return bufferSize;
     }
 
-    public void setBufferSize(int bufferSize)
-    {
+    public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
     }
-
-    public void AddObserver(UDPListenerObserver observer)
-    {
+    
+   
+    
+    
+    public void AddObserver(UDPListenerObserver observer){
         this.observers.add(observer);
     }
-
-    public void RemoveObserver(UDPListenerObserver observer)
-    {
+    
+    
+    public void RemoveObserver(UDPListenerObserver observer){
         this.observers.remove(observer);
     }
-
+    
     private void CallObservers(DatagramPacket datagramPacket)
     {
-        this.observers.forEach((observer) ->
-        {
-            try
-            {
+        this.observers.forEach((observer) -> {
+            try{
                 observer.OnPacket(datagramPacket);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-
+                
             }
         });
     }
-
+    
     public void Start()
     {
-        if (!this.thread.isAlive())
+        if(!this.thread.isAlive())
         {
             thread.start();
         }
         stop = false;
     }
-
-    public void Stop()
-    {
+    public void Stop(){
         stop = true;
     }
 
     @Override
-    public void run()
-    {
-        while (!stop)
+    public void run() {
+        while(!stop)
         {
             try
             {
                 byte[] buffer = new byte[bufferSize];
-
+            
                 DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
-                datagramSocket.receive(incomingPacket);
-
+                datagramSocket.receive(incomingPacket);            
+                
                 CallObservers(incomingPacket);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 this.Stop();
             }

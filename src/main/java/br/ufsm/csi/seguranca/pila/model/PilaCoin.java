@@ -8,8 +8,7 @@ import java.util.List;
 /**
  * Created by cpol on 12/04/2018.
  */
-public class PilaCoin implements Serializable, Cloneable
-{
+public class PilaCoin implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,87 +20,69 @@ public class PilaCoin implements Serializable, Cloneable
     private Long id;
     private List<Transacao> transacoes;
 
-    public List<Transacao> getTransacoes()
-    {
+    public List<Transacao> getTransacoes() {
         return transacoes;
     }
 
-    public void setTransacoes(List<Transacao> transacoes)
-    {
+    public void setTransacoes(List<Transacao> transacoes) {
         this.transacoes = transacoes;
     }
 
-    public String getIdCriador()
-    {
+    public String getIdCriador() {
         return idCriador;
     }
 
-    public void setIdCriador(String idCriador)
-    {
+    public void setIdCriador(String idCriador) {
         this.idCriador = idCriador;
     }
 
-    public Date getDataCriacao()
-    {
+    public Date getDataCriacao() {
         return dataCriacao;
     }
 
-    public void setDataCriacao(Date dataCriacao)
-    {
+    public void setDataCriacao(Date dataCriacao) {
         this.dataCriacao = dataCriacao;
     }
 
-    public PublicKey getChaveCriador()
-    {
+    public PublicKey getChaveCriador() {
         return chaveCriador;
     }
 
-    public void setChaveCriador(PublicKey chaveCriador)
-    {
+    public void setChaveCriador(PublicKey chaveCriador) {
         this.chaveCriador = chaveCriador;
     }
 
-    public Long getNumeroMagico()
-    {
+    public Long getNumeroMagico() {
         return numeroMagico;
     }
 
-    public void setNumeroMagico(Long numeroMagico)
-    {
+    public void setNumeroMagico(Long numeroMagico) {
         this.numeroMagico = numeroMagico;
     }
 
-    public byte[] getAssinaturaMaster()
-    {
+    public byte[] getAssinaturaMaster() {
         return assinaturaMaster;
     }
 
-    public void setAssinaturaMaster(byte[] assinaturaMaster)
-    {
+    public void setAssinaturaMaster(byte[] assinaturaMaster) {
         this.assinaturaMaster = assinaturaMaster;
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Long id)
-    {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Object clone()
-    {
+    public Object clone() {
         Object clone = null;
 
-        try
-        {
+        try {
             clone = super.clone();
 
-        }
-        catch (CloneNotSupportedException e)
-        {
+        } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
 

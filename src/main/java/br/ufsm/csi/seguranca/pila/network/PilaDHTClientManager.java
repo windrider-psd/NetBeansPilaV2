@@ -33,93 +33,89 @@ import javax.crypto.Cipher;
  *
  * @author politecnico
  */
-public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObserver, PilaCoinValidatorManagerObserver
+public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObserver, PilaCoinValidatorManagerObserver 
 {
-
     private PilaDHTClient client;
     private String id;
     private PilaCoinStorage pilaCoinStorage;
-
+    
     private Usuario usuario;
-    private Socket socket;
+    private Socket socket; 
 
     private UDPBroadcaster userUDPBroadcaster;
 
-    public PilaDHTClientManager(String id, PilaCoinStorage pilaCoinStorage, Usuario usuario, UDPBroadcaster userUDPBroadcaster)
-    {
+    public PilaDHTClientManager(String id, PilaCoinStorage pilaCoinStorage, Usuario usuario, UDPBroadcaster userUDPBroadcaster) {
         this.id = id;
         this.pilaCoinStorage = pilaCoinStorage;
         this.usuario = usuario;
         this.userUDPBroadcaster = userUDPBroadcaster;
     }
-
+    
+    
+    
     @Override
-    public void OnPacket(DatagramPacket datagramPacket)
-    {
+    public void OnPacket(DatagramPacket datagramPacket) {
         try
         {
-            byte[] data = datagramPacket.getData();
+            byte[] data = datagramPacket.getData();             
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
-            Mensagem mensagem = (Mensagem) SerializationUtils.DeserializeObject(byteArrayInputStream);
+            Mensagem mensagem = (Mensagem) SerializationUtils.DeserializeObject(byteArrayInputStream);    
             byteArrayInputStream.close();
-
-            if (mensagem.getTipo() == Mensagem.TipoMensagem.PILA_TRANSF && !mensagem.getIdOrigem().equals(id))
+            
+            if(mensagem.getTipo() == Mensagem.TipoMensagem.PILA_TRANSF && !mensagem.getIdOrigem().equals(id))
             {
-                List<Transacao> transacoes = mensagem.getPilaCoin().getTransacoes();
-
-                int lastIndex = transacoes.size() - 1;
-
-                if (transacoes.get(lastIndex).getIdNovoDono().equals(id))
-                {
-                    if (pilaCoinStorage.Contains(mensagem.getPilaCoin()))
-                    {
-                        pilaCoinStorage.Update(mensagem.getPilaCoin());
-                    }
-                    else
-                    {
-                        pilaCoinStorage.Add(mensagem.getPilaCoin());
-                    }
-                }
+               List<Transacao> transacoes = mensagem.getPilaCoin().getTransacoes();
+               
+               int lastIndex = transacoes.size() - 1;
+               
+               if(transacoes.get(lastIndex).getIdNovoDono().equals(id))
+               {
+                   if(pilaCoinStorage.Contains(mensagem.getPilaCoin()))
+                   {
+                       pilaCoinStorage.Update(mensagem.getPilaCoin());
+                   }
+                   else
+                   {
+                       pilaCoinStorage.Add(mensagem.getPilaCoin());
+                   }
+               }
             }
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-
+            
         }
     }
-
+    
     public void SellPilaCoin(PilaCoin pilaCoin, User user) throws IOException
     {
-        try
-        {
-            if (pilaCoinStorage.Contains(pilaCoin) && this.client.getPilaCoin(pilaCoin.getId()) != null)
+        try {
+            if(pilaCoinStorage.Contains(pilaCoin) && this.client.getPilaCoin(pilaCoin.getId()) != null)
             {
                 Transacao transacao = new Transacao();
                 transacao.setAssinaturaDono(CreateSignature(pilaCoin));
                 transacao.setDataTransacao(new Date());
                 transacao.setIdNovoDono(user.getId());
-
+                
                 pilaCoin.getTransacoes().add(transacao);
-
+                
                 Mensagem mensagem = new Mensagem();
                 mensagem.setChavePublica(PersonalCertificate.getInstance().getPublicKey());
                 mensagem.setIdOrigem(id);
                 mensagem.setPilaCoin(pilaCoin);
                 mensagem.setTipo(Mensagem.TipoMensagem.PILA_TRANSF);
-
+                
                 userUDPBroadcaster.BroadcastSingle(mensagem, true);
             }
-        }
-        catch (ClassNotFoundException ex)
-        {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private byte[] CreateSignature(PilaCoin pilaCoin) throws IOException
     {
-        try
-        {
+       try
+       {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             SerializationUtils.SerializeObject(pilaCoin, byteArrayOutputStream);
             byte[] buffer = byteArrayOutputStream.toByteArray();
@@ -129,57 +125,46 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
             byte[] hash = digest.digest(buffer);
             Cipher cipher = Cipher.getInstance("RSA");
             byte[] signature;
-            synchronized (cipher)
+            synchronized(cipher)
             {
                 cipher.init(Cipher.ENCRYPT_MODE, PersonalCertificate.getInstance().getPrivateKey());
                 signature = cipher.doFinal(hash);
             }
             return signature;
-        }
-        catch (Exception ex)
-        {
+       }
+       catch(Exception ex)
+       {
             return null;
-        }
+       }
     }
 
     @Override
-    public void OnMasterFound(InetAddress inetAddress, int port)
-    {
-        try
-        {
+    public void OnMasterFound(InetAddress inetAddress, int port) {
+        try {
             this.client = new PilaDHTClient(inetAddress.toString().substring(1), port, this.usuario);
-        }
-        catch (IOException ex)
-        {
+        } catch (IOException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (ClassNotFoundException ex)
-        {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     @Override
-    public void OnMasterError()
-    {
+    public void OnMasterError() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void OnFinishedValidation(PilaCoin pilaCoin)
-    {
-        try
-        {
+    public void OnFinishedValidation(PilaCoin pilaCoin) {
+        try {
             this.client.setPilaCoin(pilaCoin);
-        }
-        catch (IOException ex)
-        {
+        } catch (IOException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (ClassNotFoundException ex)
-        {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    
+    
 }
