@@ -13,8 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -29,20 +27,39 @@ public class SerializableUser
 
     public SerializableUser()
     {
-        this.id = "null";
-        this.inetAddress = "192.168.32.186";
-        this.publicKey = "null";
     }
 
-    
-    
+    public static SerializableUser FromUser(User user)
+    {
+        SerializableUser serializableUser = new SerializableUser();
+        serializableUser.setId(user.getId());
+        serializableUser.setInetAddress(user.getInetAddress().toString());
+        serializableUser.setPublicKey(Base64.getEncoder().encodeToString(user.getPublicKey().getEncoded()));
+        return serializableUser;
+    }
+
+    public User ToUser() throws UnknownHostException, NoSuchAlgorithmException, InvalidKeySpecException
+    {
+
+        User user = new User();
+        user.setId(this.getId());
+        user.setInetAddress(InetAddress.getByName(this.getInetAddress().substring(1)));
+        byte[] byteKey = Base64.getDecoder().decode(this.getPublicKey());
+        X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+
+        user.setPublicKey(kf.generatePublic(X509publicKey));
+        return user;
+
+    }
+
     /*public SerializableUser(User user)
     {
         this.id = user.getId();
         this.inetAddress = user.getInetAddress().toString();
         this.publicKey = Base64.getEncoder().encodeToString(user.getPublicKey().getEncoded());
     }*/
-    /*public User getUser() throws UnknownHostException, InvalidKeySpecException
+ /*public User getUser() throws UnknownHostException, InvalidKeySpecException
     {
         try
         {

@@ -16,7 +16,6 @@ public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValid
     
     private Set<PilaCoinValidator> pilaCoinValidators = new HashSet<>();
     private Set<PilaCoin> scheduledPilaCoins = new HashSet<>();
-    
     private boolean ready = false;
     
     private PilaCoinValidatorManager(){
@@ -121,5 +120,27 @@ public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValid
         Thread thread = new Thread(pilaCoinValidator);
         thread.start();
     }
+
+    public Set<PilaCoinValidator> getPilaCoinValidators()
+    {
+        return pilaCoinValidators;
+    }
+
+    public void setPilaCoinValidators(Set<PilaCoinValidator> pilaCoinValidators)
+    {
+        this.pilaCoinValidators = pilaCoinValidators;
+    }
+
+    public Set<PilaCoin> getScheduledPilaCoins()
+    {
+        return scheduledPilaCoins;
+    }
+
+    public void setScheduledPilaCoins(Set<PilaCoin> scheduledPilaCoins)
+    {
+        this.scheduledPilaCoins = scheduledPilaCoins;
+    }
+    
+    
 
 }

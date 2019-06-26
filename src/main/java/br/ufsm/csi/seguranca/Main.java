@@ -1,6 +1,6 @@
 package br.ufsm.csi.seguranca;
 
-import br.ufsm.csi.seguranca.node.NodeListener;
+import br.ufsm.csi.seguranca.node.NodeJSListener;
 import br.ufsm.csi.seguranca.pila.scouting.UserScout;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 import br.ufsm.csi.seguranca.pila.scouting.MasterScout;
@@ -42,7 +42,7 @@ public class Main
     public static String id;
     public static Usuario usuario;
     
-    public static final int numberOfCreatorThreads = 3;
+    public static final int numberOfCreatorThreads = 1;
     public static final Thread[] pilaCoinCreatorThreads = new Thread[numberOfCreatorThreads];
 
     public static final String certificateFileName = "certificate.per";
@@ -84,7 +84,7 @@ public class Main
         
         CreateUser();
         
-        NodeListener nodelistener = new NodeListener("br.ufsm.csi.seguranca.node.controllers");
+        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers");
         
         System.out.println("User Id: " + id);
         System.out.println("TCPServer: " + tCPServer.getServerSocket().getInetAddress() + ":" + tCPServer.getServerSocket().getLocalPort());

@@ -5,15 +5,14 @@
  */
 package br.ufsm.csi.seguranca.node;
 
-import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
 import br.ufsm.csi.seguranca.pila.network.TCPServer;
 import br.ufsm.csi.seguranca.pila.network.TCPServerObserver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.ServerSocket;
@@ -35,7 +34,7 @@ import java.util.stream.Collectors;
  *
  * @author politecnico
  */
-public class NodeListener implements TCPServerObserver
+public class NodeJSListener implements TCPServerObserver
 {
 
     @Override
@@ -68,7 +67,7 @@ public class NodeListener implements TCPServerObserver
         this.socket = client;
     }
 
-    private Map< String, Map< OperationType, Set< Route>>> routeMapMap = new HashMap<>();
+    private Map<String, Map<OperationType, Route>> routeMapMap = new HashMap<>();
     private static Map< String, Class> builtInMap = new HashMap< String, Class>();
 
     
@@ -88,7 +87,7 @@ public class NodeListener implements TCPServerObserver
     private boolean caseSentitiveCommands;
     private TCPServer tcpServer;
 
-    public NodeListener(String packageName)
+    public NodeJSListener(String packageName)
     {
 
         try
@@ -101,7 +100,7 @@ public class NodeListener implements TCPServerObserver
         }
         catch (IOException ex)
         {
-            Logger.getLogger(NodeListener.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -116,7 +115,6 @@ public class NodeListener implements TCPServerObserver
                 Annotation[] annotations = c.getAnnotations();
                 for (Annotation annotation : annotations)
                 {
-                    System.out.println(annotation);
                     if (annotation.annotationType().equals(NodeJSController.class))
                     {
                         return true;
@@ -155,18 +153,17 @@ public class NodeListener implements TCPServerObserver
                     }
                     if (!routeMapMap.containsKey(command))
                     {
-                        Map< OperationType, Set<Route>> routeMap = new HashMap<>();
+                        Map< OperationType, Route> routeMap = new HashMap<>();
                         for (OperationType op : OperationType.values())
                         {
-                            routeMap.put(op, new HashSet<>());
+                            routeMap.put(op, null);
                         }
 
                         routeMapMap.put(command, routeMap);
                     }
 
-                    Map< OperationType, Set<Route>> routeMap = routeMapMap.get(command);
-
-                    routeMap.get(nodeJSControllerRoute.OperationType()).add(new Route(method, instance));
+                    Map<OperationType, Route> routeMap = routeMapMap.get(command);
+                    routeMap.put(nodeJSControllerRoute.OperationType(), new Route(method, instance));
                 }
 
             }
@@ -180,6 +177,9 @@ public class NodeListener implements TCPServerObserver
 
     public void InvokeRoutes(String command, OperationType operationType, String arg)
     {
+
+        Object respArg;
+        ResponseStatus responseStatus;
         if (!caseSentitiveCommands)
         {
             command = command.toLowerCase();
@@ -187,79 +187,95 @@ public class NodeListener implements TCPServerObserver
 
         if (routeMapMap.containsKey(command))
         {
-            Set<Route> routes = routeMapMap.get(command).get(operationType);
-            Object returnedValue = null;
-
-            for (Route route : routes)
+            Route route = routeMapMap.get(command).get(operationType);
+            if (route == null)
+            {
+                responseStatus = ResponseStatus.INVALID;
+                respArg = new NodeJSCommandError("NRT", "No route for " + command);
+            }
+            else
             {
                 try
                 {
-
                     if (route.getMethod().getParameterCount() == 0)
                     {
-                        returnedValue = route.InvokeRoute(arg);
+                        respArg = route.InvokeRoute(arg);
+                        responseStatus = ResponseStatus.OK;
                     }
                     else if (isValidJSON(arg))
                     {
                         Parameter parameter = route.getMethod().getParameters()[0];
-                        if (!parameter.getType().isPrimitive())
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        try
                         {
-                            ObjectMapper objectMapper = new ObjectMapper();
                             Object obj;
-                            try
-                            {
-                                obj = objectMapper.readValue(arg, parameter.getType());
-                            }
-                            catch (Exception ex)
-                            {
-                                continue;
-                            }
-                            returnedValue = route.InvokeRoute(obj);
-
+                            obj = objectMapper.readValue(arg, parameter.getType());
+                            
+                            respArg = route.InvokeRoute(obj);
+                            responseStatus = ResponseStatus.OK;
+                            System.out.println(respArg);
+                        }
+                        catch (IOException | IllegalAccessException | IllegalArgumentException ex)
+                        {
+                            respArg = NodeJSCommandError.FromException(ex);
+                            responseStatus = ResponseStatus.ERROR;
+                        }
+                        catch (InvocationTargetException ex)
+                        {
+                            responseStatus = ResponseStatus.ERROR;
+                            respArg = NodeJSCommandError.FromException((Exception) ex.getTargetException());
                         }
                     }
                     else
                     {
+                        Object returnedValue = null;
                         Parameter parameter = route.getMethod().getParameters()[0];
-
                         try
                         {
+                            boolean valid = false;
                             if (parameter.getType().isPrimitive())
                             {
                                 if (parameter.getType().equals(boolean.class))
                                 {
                                     boolean value = Boolean.parseBoolean(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(byte.class))
                                 {
                                     byte value = Byte.parseByte(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(short.class))
                                 {
                                     short value = Short.parseShort(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(int.class))
                                 {
                                     int value = Integer.parseInt(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(long.class))
                                 {
                                     long value = Long.parseLong(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(float.class))
                                 {
                                     float value = Float.parseFloat(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(double.class))
                                 {
                                     double value = Double.parseDouble(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                             }
                             else if (IsFromPrimitive(parameter.getType()))
@@ -268,80 +284,114 @@ public class NodeListener implements TCPServerObserver
                                 {
                                     Boolean value = Boolean.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(Byte.class))
                                 {
                                     Byte value = Byte.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(Short.class))
                                 {
                                     Short value = Short.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(Integer.class))
                                 {
                                     Integer value = Integer.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(Long.class))
                                 {
                                     Long value = Long.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(Float.class))
                                 {
                                     Float value = Float.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                                 else if (parameter.getType().equals(Double.class))
                                 {
                                     Double value = Double.valueOf(arg);
                                     returnedValue = route.InvokeRoute(value);
+                                    valid = true;
                                 }
                             }
                             else if (parameter.getType().equals(String.class))
                             {
                                 returnedValue = route.InvokeRoute(arg);
+                                valid = true;
+                            }
+                            /*else
+                            {
+                                responseStatus = ResponseStatus.INVALID;
+                                respArg = new NodeJSCommandError("NRT", "No route for " + command);
+                            }*/
+                            
+                            if(valid)
+                            {
+                                respArg = route.InvokeRoute(returnedValue);
+                                responseStatus = ResponseStatus.OK;
                             }
                             else
                             {
-                                continue;
+                                respArg = route.InvokeRoute(new NodeJSCommandError("IARG", "Invalid arg"));
+                                responseStatus = ResponseStatus.INVALID;
                             }
                         }
                         catch (Exception ex)
                         {
-                            continue;
+                            responseStatus = ResponseStatus.ERROR;
+                            respArg = NodeJSCommandError.FromException(ex);
                         }
                     }
-
-                    if (returnedValue != null && socket != null && operationType == OperationType.READ)
-                    {
-                        byte[] bytes;
-                        if (returnedValue.getClass().isPrimitive() || IsFromPrimitive(returnedValue.getClass()))
-                        {
-                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                            SerializationUtils.SerializeObject(returnedValue.toString(), byteArrayOutputStream);
-                            bytes = byteArrayOutputStream.toByteArray();
-
-                        }
-                        else
-                        {
-                            ObjectMapper mapper = new ObjectMapper();
-                            String json = mapper.writeValueAsString(returnedValue);
-                            bytes = json.getBytes();
-                        }
-                        socket.getOutputStream().write(bytes);
-                    }
+                    //
                 }
-                catch (Exception ex)
+                catch (IllegalAccessException | IllegalArgumentException ex)
                 {
-                    ex.printStackTrace();
+                    responseStatus = ResponseStatus.ERROR;
+                    respArg = NodeJSCommandError.FromException(ex);
+                }
+                catch (InvocationTargetException ex)
+                {
+                    responseStatus = ResponseStatus.ERROR;
+                    respArg = NodeJSCommandError.FromException((Exception) ex.getTargetException());
                 }
             }
-
         }
+        else
+        {
+            responseStatus = ResponseStatus.INVALID;
+            respArg = new NodeJSCommandError("CMP", "No command path for " + command);
+        }
+
+        if (socket != null)
+        {
+            NodeJSCommandResponse nodeJSCommandResponse = new NodeJSCommandResponse();
+            nodeJSCommandResponse.setArg(respArg);
+            nodeJSCommandResponse.setResponseStatus(responseStatus);
+            try
+            {
+                byte[] bytes;
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writeValueAsString(nodeJSCommandResponse);
+                bytes = json.getBytes();
+                socket.getOutputStream().write(bytes);
+            }
+            catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
     }
+    
 
     private static boolean IsFromPrimitive(Class classz)
     {

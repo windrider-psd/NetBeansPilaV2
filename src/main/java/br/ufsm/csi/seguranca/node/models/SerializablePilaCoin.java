@@ -5,8 +5,10 @@
  */
 package br.ufsm.csi.seguranca.node.models;
 
+import br.ufsm.csi.seguranca.pila.model.PilaCoin;
 import br.ufsm.csi.seguranca.pila.model.Transacao;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +27,20 @@ public class SerializablePilaCoin
     private byte[] assinaturaMaster;
     private Long id;
     private List<Transacao> transacoes;
+    
+    public static SerializablePilaCoin FromPilaCoin(PilaCoin pilaCoin)
+    {
+        SerializablePilaCoin serializablePilaCoin = new SerializablePilaCoin();
+        serializablePilaCoin.setAssinaturaMaster(pilaCoin.getAssinaturaMaster());
+        serializablePilaCoin.setChaveCriador(Base64.getEncoder().encodeToString(pilaCoin.getChaveCriador().getEncoded()));
+        serializablePilaCoin.setDataCriacao(pilaCoin.getDataCriacao());
+        serializablePilaCoin.setId(pilaCoin.getId());
+        serializablePilaCoin.setIdCriador(pilaCoin.getIdCriador());
+        serializablePilaCoin.setNumeroMagico(pilaCoin.getNumeroMagico());
+        serializablePilaCoin.setTransacoes(pilaCoin.getTransacoes());
+        return serializablePilaCoin;
+    }
+    
     
     public List<Transacao> getTransacoes() {
         return transacoes;

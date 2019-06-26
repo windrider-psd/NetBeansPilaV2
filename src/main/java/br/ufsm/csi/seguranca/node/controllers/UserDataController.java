@@ -27,40 +27,15 @@ public class UserDataController {
     
       
     @NodeJSControllerRoute(CommandPath = "user", OperationType = OperationType.READ)
-    public SerializableUser ReadUser() throws JsonProcessingException
+    public SerializableUser ReadUser() throws Exception
     {
-        SerializableUser serializableUser = new SerializableUser();
-        serializableUser.setId(Main.thisUser.getId());
-        serializableUser.setInetAddress(Main.thisUser.getInetAddress().toString());
-        serializableUser.setPublicKey(Base64.getEncoder().encodeToString(Main.thisUser.getPublicKey().getEncoded()));
-        return serializableUser;
-       //return new SerializableUser(Main.thisUser);
+        throw new Exception("Hello World!");
     }
     @NodeJSControllerRoute(CommandPath = "user", OperationType = OperationType.WRITE)
-    public void WriteUser(SerializableUser serializableUser)
+    public SerializableUser WriteUser(SerializableUser serializableUser) throws UnknownHostException, NoSuchAlgorithmException, InvalidKeySpecException
     {
-        try
-        {
-            User user = new User();
-            user.setId(serializableUser.getId());
-            user.setInetAddress(InetAddress.getByName(serializableUser.getInetAddress().substring(1)));
-            byte[] byteKey = Base64.getDecoder().decode(serializableUser.getPublicKey());
-            X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            
-            user.setPublicKey(kf.generatePublic(X509publicKey));
-            Main.thisUser = user;
-            
-            System.out.println(Main.thisUser.getId());
-        }
-        catch (NoSuchAlgorithmException ex)
-        {
-            Logger.getLogger(SerializableUser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (InvalidKeySpecException | UnknownHostException ex)
-        {
-            Logger.getLogger(UserDataController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Main.thisUser = serializableUser.ToUser();
+        return SerializableUser.FromUser(Main.thisUser);
     }
     
 }

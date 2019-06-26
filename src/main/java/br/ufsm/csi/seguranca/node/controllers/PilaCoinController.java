@@ -11,10 +11,13 @@ import br.ufsm.csi.seguranca.node.NodeJSControllerRoute;
 import br.ufsm.csi.seguranca.node.OperationType;
 import br.ufsm.csi.seguranca.node.models.SerializablePilaCoin;
 import br.ufsm.csi.seguranca.pila.model.PilaCoin;
+import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidator;
+import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -24,29 +27,40 @@ import java.util.List;
 public class PilaCoinController
 {
 
-    @NodeJSControllerRoute(CommandPath = "pilacoin", OperationType = OperationType.READ)
-    public List<SerializablePilaCoin> getPilaCoins()
+    @NodeJSControllerRoute(CommandPath = "pilacoin/storage", OperationType = OperationType.READ)
+    public List<SerializablePilaCoin> getStorage()
     {
+        List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
+        
         List<PilaCoin> pilaCoins = Arrays.asList(Main.pilaCoinStorage.GetAll());
 
-        List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
-
-        pilaCoins.stream().map((pilaCoin) ->
-        {
-            SerializablePilaCoin serializablePilaCoin = new SerializablePilaCoin();
-            serializablePilaCoin.setAssinaturaMaster(pilaCoin.getAssinaturaMaster());
-            serializablePilaCoin.setChaveCriador(Base64.getEncoder().encodeToString(pilaCoin.getChaveCriador().getEncoded()));
-            serializablePilaCoin.setDataCriacao(pilaCoin.getDataCriacao());
-            serializablePilaCoin.setId(pilaCoin.getId());
-            serializablePilaCoin.setIdCriador(pilaCoin.getIdCriador());
-            serializablePilaCoin.setNumeroMagico(pilaCoin.getNumeroMagico());
-            serializablePilaCoin.setTransacoes(pilaCoin.getTransacoes());
-            return serializablePilaCoin;
-        }).forEachOrdered((serializablePilaCoin) ->
-        {
-            serializablePilaCoins.add(serializablePilaCoin);
+        pilaCoins.forEach(pilaCoin -> {
+            serializablePilaCoins.add(SerializablePilaCoin.FromPilaCoin(pilaCoin));
         });
-
+        return serializablePilaCoins;
+    }
+    
+    @NodeJSControllerRoute(CommandPath = "pilacoin/schedule", OperationType = OperationType.READ)
+    public List<SerializablePilaCoin> getScheduled()
+    {
+        List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
+        Set<PilaCoin> scheduled = PilaCoinValidatorManager.getInstance().getScheduledPilaCoins();
+        
+        scheduled.forEach(pilaCoin -> {
+            serializablePilaCoins.add(SerializablePilaCoin.FromPilaCoin(pilaCoin));
+        });
+        return serializablePilaCoins;
+    }
+    @NodeJSControllerRoute(CommandPath = "pilacoin/validation", OperationType = OperationType.READ)
+    public List<SerializablePilaCoin> getUnderValidation()
+    {
+        List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
+        
+        Set<PilaCoinValidator> validators = PilaCoinValidatorManager.getInstance().getPilaCoinValidators();
+        validators.forEach(validator -> {
+            serializablePilaCoins.add(SerializablePilaCoin.FromPilaCoin(validator.getPilaCoin()));
+        });
+        
         return serializablePilaCoins;
     }
 
