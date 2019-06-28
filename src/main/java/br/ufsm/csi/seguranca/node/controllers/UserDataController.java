@@ -27,9 +27,9 @@ public class UserDataController {
     
       
     @NodeJSControllerRoute(CommandPath = "user", OperationType = OperationType.READ)
-    public SerializableUser ReadUser() throws Exception
+    public SerializableUser ReadUser()
     {
-        throw new Exception("Hello World!");
+        return SerializableUser.FromUser(Main.thisUser);
     }
     @NodeJSControllerRoute(CommandPath = "user", OperationType = OperationType.WRITE)
     public SerializableUser WriteUser(SerializableUser serializableUser) throws UnknownHostException, NoSuchAlgorithmException, InvalidKeySpecException

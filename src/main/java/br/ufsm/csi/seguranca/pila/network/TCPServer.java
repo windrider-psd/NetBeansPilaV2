@@ -72,23 +72,17 @@ public class TCPServer implements Runnable
             {
                 try
                 {
-                    
                     synchronized(clients)
                     {
                         Set<Socket> closedSockets = new HashSet<>();
                         for(Socket client : clients)
                         {
-                            
                             if(!client.isConnected() || client.isClosed())
                             {
+                                System.out.println("disconnected");
                                 closedSockets.add(client);
                                 continue;
                             }
-                            
-                            
-                            
-                            
-                            
                             
                             if(client.getInputStream().available() != 0)
                             {
@@ -118,21 +112,13 @@ public class TCPServer implements Runnable
                                 }
                                 System.out.println(object);
                                 CallObserversMessageReceived(client, object);
-
-                                
                             }
-                            
-                            
-                            
-                            
-
                         }
                         
                         for(Socket socket : closedSockets)
                         {
                             clients.remove(socket);
                         }
-                        
                     }
                     
                     Thread.sleep(1000);
