@@ -45,7 +45,7 @@ public class NodeJSListener implements TCPClientObserver
                 if(message.getArg() instanceof NodeJSCommand)
                 {
                     NodeJSCommand nodeJSCommand = objectMapper.readValue((String) obj, NodeJSCommand.class);
-                    InvokeRoutes(nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
+                    InvokeRoutes(nodeJSCommand.getId(), nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
                 }
             }
             catch (IOException ex)
@@ -150,7 +150,7 @@ public class NodeJSListener implements TCPClientObserver
         }
     }
 
-    public void InvokeRoutes(String command, OperationType operationType, String arg)
+    public void InvokeRoutes(String id, String command, OperationType operationType, String arg)
     {
 
         Object respArg;
@@ -351,6 +351,7 @@ public class NodeJSListener implements TCPClientObserver
             NodeJSCommandResponse nodeJSCommandResponse = new NodeJSCommandResponse();
             nodeJSCommandResponse.setArg(respArg);
             nodeJSCommandResponse.setResponseStatus(responseStatus);
+            nodeJSCommandResponse.setId(id);
             
             NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.Response, nodeJSCommandResponse);
             try

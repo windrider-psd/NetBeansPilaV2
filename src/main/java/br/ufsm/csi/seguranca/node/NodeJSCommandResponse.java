@@ -11,6 +11,7 @@ package br.ufsm.csi.seguranca.node;
  */
 public class NodeJSCommandResponse
 {
+    private String id;
     private ResponseStatus responseStatus;
     private Object arg;
 
@@ -18,12 +19,25 @@ public class NodeJSCommandResponse
     {
     }
 
-    
-    public NodeJSCommandResponse(ResponseStatus responseStatus, Object arg)
+    public NodeJSCommandResponse(String id, ResponseStatus responseStatus, Object arg)
     {
+        this.id = id;
         this.responseStatus = responseStatus;
         this.arg = arg;
     }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    
+    
 
     public ResponseStatus getResponseStatus()
     {
