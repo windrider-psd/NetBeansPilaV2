@@ -15,6 +15,7 @@ import br.ufsm.csi.seguranca.pila.network.UDPBroadcaster;
 import br.ufsm.csi.seguranca.pila.network.UDPListener;
 import br.ufsm.csi.seguranca.util.RandomString;
 import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
+import br.ufsm.csi.seguranca.pila.network.TCPClient;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,6 +26,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -83,8 +85,10 @@ public class Main
         SetUpMining();
         
         CreateUser();
+        TCPClient tCPClient = new TCPClient(new Socket(getLocalHost(), 42228), 5012);
         
-        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers");
+        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers", tCPClient);
+        tCPClient.StartListening();
         
         System.out.println("User Id: " + id);
         System.out.println("TCPServer: " + tCPServer.getServerSocket().getInetAddress() + ":" + tCPServer.getServerSocket().getLocalPort());

@@ -5,8 +5,8 @@
  */
 package br.ufsm.csi.seguranca.node;
 
-import br.ufsm.csi.seguranca.pila.network.TCPServer;
-import br.ufsm.csi.seguranca.pila.network.TCPServerObserver;
+import br.ufsm.csi.seguranca.pila.network.TCPClient;
+import br.ufsm.csi.seguranca.pila.network.TCPClientObserver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -15,8 +15,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,27 +24,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  *
  * @author politecnico
  */
-public class NodeJSListener implements TCPServerObserver
+public class NodeJSListener implements TCPClientObserver
 {
 
     @Override
-    public void OnMessageReceived(Socket socket, Object obj)
+    public void OnMessage(TCPClient socket, Object obj)
     {
         if (obj instanceof String)
         {
             try
             {
                 ObjectMapper objectMapper = new ObjectMapper();
-                NodeJSCommand nodeJSCommand = objectMapper.readValue((String) obj, NodeJSCommand.class);
-                InvokeRoutes(nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
+                NodeJSMessage message = objectMapper.readValue((String) obj, NodeJSMessage.class);
+                if(message.getArg() instanceof NodeJSCommand)
+                {
+                    NodeJSCommand nodeJSCommand = objectMapper.readValue((String) obj, NodeJSCommand.class);
+                    InvokeRoutes(nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
+                }
             }
             catch (IOException ex)
             {
@@ -55,17 +55,6 @@ public class NodeJSListener implements TCPServerObserver
         }
     }
 
-    @Override
-    public void OnMessageSent(Socket socket, Object obj)
-    {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void OnConnection(Socket client)
-    {
-        this.socket = client;
-    }
 
     private Map<String, Map<OperationType, Route>> routeMapMap = new HashMap<>();
     private static Map< String, Class> builtInMap = new HashMap< String, Class>();
@@ -83,25 +72,13 @@ public class NodeJSListener implements TCPServerObserver
         builtInMap.put("short", Short.TYPE);
     }
 
-    private Socket socket;
     private boolean caseSentitiveCommands;
-    private TCPServer tcpServer;
+    private TCPClient tcpClient;
 
-    public NodeJSListener(String packageName)
+    public NodeJSListener(String packageName, TCPClient tCPClient)
     {
-
-        try
-        {
-            SetUpRoutes(packageName);
-            this.tcpServer = new TCPServer(new ServerSocket(42228), 5012, 1);
-            this.tcpServer.AddObserver(this);
-            this.tcpServer.StartListening();
-
-        }
-        catch (IOException ex)
-        {
-            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        SetUpRoutes(packageName);
+        this.tcpClient = tCPClient;
     }
 
     private void SetUpRoutes(String packageName)
@@ -165,9 +142,7 @@ public class NodeJSListener implements TCPServerObserver
                     Map<OperationType, Route> routeMap = routeMapMap.get(command);
                     routeMap.put(nodeJSControllerRoute.OperationType(), new Route(method, instance));
                 }
-
             }
-
         }
         catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | SecurityException ex)
         {
@@ -371,18 +346,20 @@ public class NodeJSListener implements TCPServerObserver
             respArg = new NodeJSCommandError("CMP", "No command path for " + command);
         }
 
-        if (socket != null)
+        if (!this.tcpClient.getSocket().isClosed())
         {
             NodeJSCommandResponse nodeJSCommandResponse = new NodeJSCommandResponse();
             nodeJSCommandResponse.setArg(respArg);
             nodeJSCommandResponse.setResponseStatus(responseStatus);
+            
+            NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.Response, nodeJSCommandResponse);
             try
             {
                 byte[] bytes;
                 ObjectMapper mapper = new ObjectMapper();
-                String json = mapper.writeValueAsString(nodeJSCommandResponse);
+                String json = mapper.writeValueAsString(nodeJSMessage);
                 bytes = json.getBytes();
-                socket.getOutputStream().write(bytes);
+                this.tcpClient.getSocket().getOutputStream().write(bytes);
             }
             catch (IOException ex)
             {
@@ -459,5 +436,27 @@ public class NodeJSListener implements TCPServerObserver
         }
         return classes;
     }
+
+  
+
+    @Override
+    public void OnClosed(TCPClient client)
+    {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public TCPClient getTcpClient()
+    {
+        return tcpClient;
+    }
+
+    public void setTcpClient(TCPClient tcpClient)
+    {
+        this.tcpClient = tcpClient;
+    }
+    
+    
+    
+    
 
 }
