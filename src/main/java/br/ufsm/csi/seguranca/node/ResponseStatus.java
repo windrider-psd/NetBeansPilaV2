@@ -5,11 +5,18 @@
  */
 package br.ufsm.csi.seguranca.node;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  *
  * @author politecnico
  */
 public enum ResponseStatus
 {
-    OK, INVALID, ERROR
+    OK, INVALID, ERROR;
+    
+    @JsonValue
+    public int toValue() {
+        return ordinal();
+    }
 }

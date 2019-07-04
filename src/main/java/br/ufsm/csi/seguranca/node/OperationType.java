@@ -5,10 +5,17 @@
  */
 package br.ufsm.csi.seguranca.node;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  *
  * @author politecnico
  */
 public enum OperationType {
-    READ, WRITE
+    READ, WRITE;
+    
+    @JsonValue
+    public int toValue() {
+        return ordinal();
+    }
 }

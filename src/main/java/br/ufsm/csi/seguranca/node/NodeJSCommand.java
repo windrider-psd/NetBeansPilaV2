@@ -11,7 +11,7 @@ package br.ufsm.csi.seguranca.node;
  */
 class NodeJSCommand
 {
-    private String id;
+    private int commandId;
     private String commandPath;
     private OperationType operationType;
     private String arg;
@@ -20,28 +20,26 @@ class NodeJSCommand
     {
     }
 
-    public NodeJSCommand(String id, String commandPath, OperationType operationType, String arg)
+    public NodeJSCommand(int commandId, String commandPath, OperationType operationType, String arg)
     {
-        this.id = id;
+        this.commandId = commandId;
         this.commandPath = commandPath;
         this.operationType = operationType;
         this.arg = arg;
     }
 
     
-    
-    public String getId()
+    public int getCommandId()
     {
-        return id;
+        return commandId;
     }
 
-    public void setId(String id)
+    public void setCommandId(int commandId)
     {
-        this.id = id;
+        this.commandId = commandId;
     }
 
-    
-    
+   
 
     public String getCommandPath()
     {
@@ -72,6 +70,7 @@ class NodeJSCommand
     {
         this.arg = arg;
     }
+
     
     
 }

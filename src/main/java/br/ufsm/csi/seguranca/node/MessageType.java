@@ -5,11 +5,18 @@
  */
 package br.ufsm.csi.seguranca.node;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  *
  * @author politecnico
  */
 public enum MessageType
 {
-    Command, Response
+    COMMAND, RESPONSE;
+    
+    @JsonValue
+    public int toValue() {
+        return ordinal();
+    }
 }

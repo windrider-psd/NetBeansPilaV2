@@ -36,6 +36,7 @@ public class TCPClient implements Runnable
     {
         this.clientBufferSize = clientBufferSize;
         this.thread = new Thread(this);
+        this.socket = socket;
     }
     
     
@@ -51,6 +52,7 @@ public class TCPClient implements Runnable
                     
                     if(!this.socket.isConnected() || this.socket.isClosed())
                     {
+                        System.out.println("ahahah");
                         close = true;
                     }
 

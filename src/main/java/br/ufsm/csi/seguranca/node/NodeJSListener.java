@@ -7,6 +7,7 @@ package br.ufsm.csi.seguranca.node;
 
 import br.ufsm.csi.seguranca.pila.network.TCPClient;
 import br.ufsm.csi.seguranca.pila.network.TCPClientObserver;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -24,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +35,7 @@ import java.util.stream.Collectors;
  */
 public class NodeJSListener implements TCPClientObserver
 {
-
+    
     @Override
     public void OnMessage(TCPClient socket, Object obj)
     {
@@ -42,20 +45,33 @@ public class NodeJSListener implements TCPClientObserver
             {
                 ObjectMapper objectMapper = new ObjectMapper();
                 NodeJSMessage message = objectMapper.readValue((String) obj, NodeJSMessage.class);
-                if(message.getArg() instanceof NodeJSCommand)
+                
+                if(message.getMessageType() == MessageType.COMMAND)
                 {
-                    NodeJSCommand nodeJSCommand = objectMapper.readValue((String) obj, NodeJSCommand.class);
-                    InvokeRoutes(nodeJSCommand.getId(), nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
+                    NodeJSCommand nodeJSCommand = objectMapper.readValue(message.getArg(), NodeJSCommand.class);
+                    InvokeRoutes(nodeJSCommand.getCommandId(), nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
+                    
+                    WriteCommand("test", OperationType.READ, "ababa");
+                    
+                }
+                else
+                {
+                    System.out.println(message.getArg());
                 }
             }
             catch (IOException ex)
             {
                 System.out.println("Invalid Command: " + ex.getMessage());
             }
+            
         }
+        
+        
     }
 
-
+    
+    
+    
     private Map<String, Map<OperationType, Route>> routeMapMap = new HashMap<>();
     private static Map< String, Class> builtInMap = new HashMap< String, Class>();
 
@@ -74,11 +90,12 @@ public class NodeJSListener implements TCPClientObserver
 
     private boolean caseSentitiveCommands;
     private TCPClient tcpClient;
-
+    private int writeCommandCount = 1;
     public NodeJSListener(String packageName, TCPClient tCPClient)
     {
         SetUpRoutes(packageName);
         this.tcpClient = tCPClient;
+        this.tcpClient.AddObserver(this);
     }
 
     private void SetUpRoutes(String packageName)
@@ -149,8 +166,39 @@ public class NodeJSListener implements TCPClientObserver
             ex.printStackTrace();
         }
     }
-
-    public void InvokeRoutes(String id, String command, OperationType operationType, String arg)
+    
+    public void WriteCommand(String commandPath, OperationType operationType, Object arg)
+    {
+        
+        try
+        {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String argJson = objectMapper.writeValueAsString(arg);
+            NodeJSCommand nodeJSCommand = new NodeJSCommand(writeCommandCount++, commandPath, operationType, argJson);
+            
+            String jsonCommand = objectMapper.writeValueAsString(nodeJSCommand);
+            
+            NodeJSMessage nodeJSMessage = new NodeJSMessage();
+            nodeJSMessage.setArg(jsonCommand);
+            nodeJSMessage.setMessageType(MessageType.COMMAND);
+            
+            String jsonMessage = objectMapper.writeValueAsString(nodeJSMessage);
+            
+            byte[] bytes = jsonMessage.getBytes();
+            this.tcpClient.getSocket().getOutputStream().write(bytes);
+        }
+        catch (JsonProcessingException ex)
+        {
+            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+    }
+    
+    public void InvokeRoutes(int id, String command, OperationType operationType, String arg)
     {
 
         Object respArg;
@@ -351,15 +399,18 @@ public class NodeJSListener implements TCPClientObserver
             NodeJSCommandResponse nodeJSCommandResponse = new NodeJSCommandResponse();
             nodeJSCommandResponse.setArg(respArg);
             nodeJSCommandResponse.setResponseStatus(responseStatus);
-            nodeJSCommandResponse.setId(id);
+            nodeJSCommandResponse.setCommandId(id);
             
-            NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.Response, nodeJSCommandResponse);
             try
             {
-                byte[] bytes;
                 ObjectMapper mapper = new ObjectMapper();
+                String jsonarg = mapper.writeValueAsString(nodeJSCommandResponse);
+
+                NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.RESPONSE, jsonarg);
+                
+                
                 String json = mapper.writeValueAsString(nodeJSMessage);
-                bytes = json.getBytes();
+                byte[] bytes = json.getBytes();
                 this.tcpClient.getSocket().getOutputStream().write(bytes);
             }
             catch (IOException ex)

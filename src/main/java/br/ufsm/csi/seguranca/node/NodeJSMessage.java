@@ -12,15 +12,13 @@ package br.ufsm.csi.seguranca.node;
 public class NodeJSMessage
 {
     private MessageType messageType;
-    private Object arg;
+    private String arg;
 
     public NodeJSMessage()
     {
     }
 
-    
-    
-    public NodeJSMessage(MessageType messageType, Object arg)
+    public NodeJSMessage(MessageType messageType, String arg)
     {
         this.messageType = messageType;
         this.arg = arg;
@@ -36,16 +34,19 @@ public class NodeJSMessage
         this.messageType = messageType;
     }
 
-    public Object getArg()
+    public String getArg()
     {
         return arg;
     }
 
-    public void setArg(Object arg)
+    public void setArg(String arg)
     {
         this.arg = arg;
     }
+
     
+    
+   
     
     
     
