@@ -45,13 +45,11 @@ public class NodeJSListener implements TCPClientObserver
             {
                 ObjectMapper objectMapper = new ObjectMapper();
                 NodeJSMessage message = objectMapper.readValue((String) obj, NodeJSMessage.class);
-                
+                System.out.println(message.getArg());
                 if(message.getMessageType() == MessageType.COMMAND)
                 {
                     NodeJSCommand nodeJSCommand = objectMapper.readValue(message.getArg(), NodeJSCommand.class);
                     InvokeRoutes(nodeJSCommand.getCommandId(), nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
-                    
-                    WriteCommand("test", OperationType.READ, "ababa");
                     
                 }
                 else

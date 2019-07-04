@@ -8,9 +8,7 @@ package br.ufsm.csi.seguranca.pila.network;
 import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,10 +47,8 @@ public class TCPClient implements Runnable
                 boolean close = false;                
                 synchronized(this.socket)
                 {
-                    
                     if(!this.socket.isConnected() || this.socket.isClosed())
                     {
-                        System.out.println("ahahah");
                         close = true;
                     }
 
@@ -80,7 +76,7 @@ public class TCPClient implements Runnable
                 }
                 else
                 {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 }
                 
             }

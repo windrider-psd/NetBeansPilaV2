@@ -19,13 +19,13 @@ import java.util.List;
 public class SerializablePilaCoin
 {
     private long serialVersionUID;
-
+    
+    private Long id;
     private String idCriador;
     private Date dataCriacao;
     private String chaveCriador;
     private Long numeroMagico;
     private byte[] assinaturaMaster;
-    private Long id;
     private List<Transacao> transacoes;
     
     public static SerializablePilaCoin FromPilaCoin(PilaCoin pilaCoin)
