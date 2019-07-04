@@ -156,13 +156,13 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
 
     @Override
     public void OnFinishedValidation(PilaCoin pilaCoin) {
-        try {
+        /*try {
             this.client.setPilaCoin(pilaCoin);
         } catch (IOException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
     
     

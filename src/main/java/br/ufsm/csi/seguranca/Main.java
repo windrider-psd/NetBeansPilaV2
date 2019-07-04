@@ -1,6 +1,7 @@
 package br.ufsm.csi.seguranca;
 
 import br.ufsm.csi.seguranca.node.NodeJSListener;
+import br.ufsm.csi.seguranca.node.observers.ValidationObserver;
 import br.ufsm.csi.seguranca.pila.scouting.UserScout;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 import br.ufsm.csi.seguranca.pila.scouting.MasterScout;
@@ -89,7 +90,8 @@ public class Main
         
         NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers", tCPClient);
         tCPClient.StartListening();
-        
+        ValidationObserver validationObserver = new ValidationObserver(nodelistener);
+        PilaCoinValidatorManager.getInstance().AddObserver(validationObserver);
         System.out.println("User Id: " + id);
         System.out.println("TCPServer: " + tCPServer.getServerSocket().getInetAddress() + ":" + tCPServer.getServerSocket().getLocalPort());
         System.out.println("UDPMasterBroadcaster: " + udpMasterBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpMasterBroadcaster.getDatagramSocket().getLocalPort());
@@ -176,7 +178,7 @@ public class Main
     {
         try {
             pilaCoinStorage = new PilaCoinBinaryStorage("pila_coin_storage.pc", true);
-            pilaCoinStorage.Clear();
+            //pilaCoinStorage.Clear();
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

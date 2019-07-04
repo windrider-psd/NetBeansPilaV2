@@ -47,12 +47,16 @@ public class TCPClient implements Runnable
                 boolean close = false;                
                 synchronized(this.socket)
                 {
-                    if(!this.socket.isConnected() || this.socket.isClosed())
+                    try
                     {
-                        close = true;
+                         this.socket.getOutputStream().write("ping".getBytes());
                     }
-
-                    else if(this.socket.getInputStream().available() != 0)
+                    catch(Exception ex)
+                    {
+                       close = true;
+                    }
+                          
+                    if(!close && this.socket.getInputStream().available() != 0)
                     {
                         byte[] buff = new byte[clientBufferSize];
                         this.socket.getInputStream().read(buff);

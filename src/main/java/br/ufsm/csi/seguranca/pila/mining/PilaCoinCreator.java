@@ -4,6 +4,7 @@ import br.ufsm.csi.seguranca.Main;
 import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
 import br.ufsm.csi.seguranca.pila.model.PersonalCertificate;
 import br.ufsm.csi.seguranca.pila.model.PilaCoin;
+import br.ufsm.csi.seguranca.pila.model.Transacao;
 import br.ufsm.csi.seguranca.util.RSAUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -12,8 +13,10 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 public class PilaCoinCreator implements Runnable
 {
@@ -21,7 +24,7 @@ public class PilaCoinCreator implements Runnable
     private static String idCriador;
     private PublicKey publicKey;
     private static final BigInteger maxMagicalNumber = new BigInteger("99999998000000000000000000000000000000000000000000000000000000000000000");
-    private PilaCoin prototype = CreatePrototype();
+    private PilaCoin prototype;
     private static long magicalNumber = Long.MIN_VALUE;
     private static HashSet<PilaCoinObserver> pilaCoinObservers = new HashSet<>();
 
@@ -59,6 +62,7 @@ public class PilaCoinCreator implements Runnable
     public PilaCoinCreator(String idCriador, PublicKey publicKey)
     {
         this.idCriador = idCriador;
+        this.prototype = CreatePrototype();
         this.publicKey = publicKey;
     }
 
@@ -121,6 +125,7 @@ public class PilaCoinCreator implements Runnable
                     e.printStackTrace();
                 }
             } while (new BigInteger(1, hash).compareTo(maxMagicalNumber) >= 0);
+            
             System.out.println("Found: " + magicalNumber);
             CallObservers(this, pilaCoin);
         }

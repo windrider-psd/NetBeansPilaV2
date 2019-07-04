@@ -5,6 +5,7 @@ import br.ufsm.csi.seguranca.pila.scouting.MasterScoutObserver;
 import br.ufsm.csi.seguranca.pila.mining.PilaCoinCreator;
 import br.ufsm.csi.seguranca.pila.mining.PilaCoinObserver;
 import br.ufsm.csi.seguranca.pila.model.PilaCoin;
+import br.ufsm.csi.seguranca.pila.model.Transacao;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -80,6 +81,16 @@ public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValid
     @Override
     public void OnPilaCoinValidatorReady(PilaCoinValidator pilaCoinValidator) {
         System.out.println("Valid: " + pilaCoinValidator.getPilaCoin().getNumeroMagico());
+        
+            Transacao t = new Transacao();
+            t.setAssinaturaDono(new byte[5]);
+            t.setDataTransacao(new Date());
+            t.setIdNovoDono("agaga");
+            
+            List<Transacao> a = new ArrayList<Transacao>();
+            a.add(t);
+            pilaCoinValidator.getPilaCoin().setTransacoes(a);
+        
         CallManagerObservers(pilaCoinValidator.getPilaCoin());
     }
 
