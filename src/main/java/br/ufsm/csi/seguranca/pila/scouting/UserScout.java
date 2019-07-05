@@ -102,7 +102,8 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
         }
     }
     private boolean IsValidMessage(Mensagem message)
-    {        
+    {
+        
         return !message.getIdOrigem().equals(id) && message.getTipo() == Mensagem.TipoMensagem.DISCOVER
                 && message.getIdOrigem() != null && message.isMaster() == false
                 && message.getEndereco() != null && message.getChavePublica() != null;

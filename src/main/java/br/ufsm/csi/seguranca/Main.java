@@ -86,7 +86,7 @@ public class Main
         SetUpMining();
         
         CreateUser();
-        TCPClient tCPClient = new TCPClient(new Socket(getLocalHost(), 42228), 5012);
+        TCPClient tCPClient = new TCPClient(new Socket(getLocalHost(), 42228), 900000);
         
         NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers", tCPClient);
         tCPClient.StartListening();
@@ -136,13 +136,11 @@ public class Main
         
         udpMasterListener = new UDPListener(masterDatagramSocket, 5012);
         Mensagem masterMessage = MasterScout.getInstance().CreateMessage(id, masterDatagramSocket.getLocalAddress(), PersonalCertificate.getInstance().getPublicKey(), masterDatagramSocket.getLocalPort());
-        udpMasterBroadcaster = new UDPBroadcaster(masterDatagramSocket, masterMessage, InetAddress.getByName("192.168.82.163"), 3333, 15000);
+        udpMasterBroadcaster = new UDPBroadcaster(masterDatagramSocket, masterMessage, InetAddress.getByName("192.168.90.194"), 3333, 15000);
         
         udpMasterListener.AddObserver(MasterScout.getInstance());
         udpMasterBroadcaster.AddObserver(MasterScout.getInstance());
         
-        udpMasterListener.Start();
-        udpMasterBroadcaster.Start();
         
         //------------------------------------//
         
@@ -150,12 +148,14 @@ public class Main
         Mensagem userMessage = UserScout.getInstance().CreateMessage(id, tCPServer.getServerSocket().getInetAddress(), PersonalCertificate.getInstance().getPublicKey(), tCPServer.getServerSocket().getLocalPort());
         udpUserBroadcaster = new UDPBroadcaster(userDatagramSocket, userMessage, InetAddress.getByName("255.255.255.255"), userDatagramSocket.getLocalPort(), 15000);
         
-        udpUserListener.AddObserver(UserScout.getInstance());
+        udpMasterListener.AddObserver(UserScout.getInstance());
         udpMasterBroadcaster.AddObserver(UserScout.getInstance());
         
         udpUserListener.Start();
-        udpUserBroadcaster.Start();        
+        udpUserBroadcaster.Start();    
         
+        udpMasterListener.Start();
+        udpMasterBroadcaster.Start();
         tCPServer.StartListening();
     }
     

@@ -7,7 +7,6 @@ package br.ufsm.csi.seguranca.pila.network;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -73,14 +72,25 @@ public class UDPListener implements Runnable{
     
     public void Start()
     {
-        if(!this.thread.isAlive())
+        synchronized(this)
         {
-            thread.start();
+            
+            if(!this.thread.isAlive())
+            {
+                thread = new Thread(this);
+                thread.start();
+            }
+            stop = false;
+            
         }
-        stop = false;
+        
     }
     public void Stop(){
-        stop = true;
+        synchronized(this)
+        {
+            stop = true;
+        }
+        
     }
 
     @Override

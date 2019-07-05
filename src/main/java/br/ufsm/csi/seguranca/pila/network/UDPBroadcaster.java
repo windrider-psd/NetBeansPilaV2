@@ -46,19 +46,24 @@ public class UDPBroadcaster implements Runnable{
         thread = new Thread(this);
     }
     
-    public synchronized void Start()
+    public void Start()
     {
-        if(!thread.isAlive())
+       if(!this.thread.isAlive())
         {
+            thread = new Thread(this);
             thread.start();
         }
-        
+
         stop = false;
-    }
+        
+}
     
-    public synchronized void Stop()
+    public void Stop()
     {
-        stop = true;
+        synchronized(this)
+        {
+            stop = true;
+        }
     }
     
    

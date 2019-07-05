@@ -88,6 +88,7 @@ public class NodeJSListener implements TCPClientObserver
     private boolean caseSentitiveCommands;
     private TCPClient tcpClient;
     private int writeCommandCount = 1;
+    
     public NodeJSListener(String packageName, TCPClient tCPClient)
     {
         SetUpRoutes(packageName);
@@ -181,7 +182,10 @@ public class NodeJSListener implements TCPClientObserver
             
             String jsonMessage = objectMapper.writeValueAsString(nodeJSMessage);
             
+            String complete = jsonMessage + "\\r\\nEND\\r\\n";
+            
             byte[] bytes = jsonMessage.getBytes();
+            
             this.tcpClient.getSocket().getOutputStream().write(bytes);
         }
         catch (JsonProcessingException ex)
@@ -407,7 +411,8 @@ public class NodeJSListener implements TCPClientObserver
                 
                 
                 String json = mapper.writeValueAsString(nodeJSMessage);
-                byte[] bytes = json.getBytes();
+                String complete = json + "\\r\\nEND\\r\\n";
+                byte[] bytes = complete.getBytes();
                 this.tcpClient.getSocket().getOutputStream().write(bytes);
             }
             catch (IOException ex)
