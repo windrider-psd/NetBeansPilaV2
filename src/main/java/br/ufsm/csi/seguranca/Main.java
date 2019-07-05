@@ -86,10 +86,10 @@ public class Main
         SetUpMining();
         
         CreateUser();
-        TCPClient tCPClient = new TCPClient(new Socket(getLocalHost(), 42228), 900000);
+       // TCPClient tCPClient = new TCPClient(new Socket(getLocalHost(), 42228), 900000);
         
-        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers", tCPClient);
-        tCPClient.StartListening();
+        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers");
+        //tCPClient.StartListening();
         ValidationObserver validationObserver = new ValidationObserver(nodelistener);
         PilaCoinValidatorManager.getInstance().AddObserver(validationObserver);
         System.out.println("User Id: " + id);
@@ -208,7 +208,7 @@ public class Main
         PilaCoinValidatorManager.getInstance().StartValidation();
     }
     
-    private static synchronized InetAddress getLocalHost() throws SocketException {
+    public static synchronized InetAddress getLocalHost() throws SocketException {
         if (localhost == null) {
             InetAddress address = null;
             Enumeration en = NetworkInterface.getNetworkInterfaces();

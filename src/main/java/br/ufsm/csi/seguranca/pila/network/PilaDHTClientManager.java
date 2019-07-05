@@ -142,6 +142,9 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
     public void OnMasterFound(InetAddress inetAddress, int port) {
         try {
             this.client = new PilaDHTClient(inetAddress.toString().substring(1), port, this.usuario);
+            Usuario u = this.client.getUsuario(this.id);
+            System.out.println(u.getId());
+            
         } catch (IOException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -163,6 +166,54 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         }*/
+    }
+
+    public PilaDHTClient getClient() {
+        return client;
+    }
+
+    public void setClient(PilaDHTClient client) {
+        this.client = client;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public PilaCoinStorage getPilaCoinStorage() {
+        return pilaCoinStorage;
+    }
+
+    public void setPilaCoinStorage(PilaCoinStorage pilaCoinStorage) {
+        this.pilaCoinStorage = pilaCoinStorage;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
+    public UDPBroadcaster getUserUDPBroadcaster() {
+        return userUDPBroadcaster;
+    }
+
+    public void setUserUDPBroadcaster(UDPBroadcaster userUDPBroadcaster) {
+        this.userUDPBroadcaster = userUDPBroadcaster;
     }
     
     

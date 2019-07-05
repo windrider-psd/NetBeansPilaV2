@@ -5,6 +5,7 @@
  */
 package br.ufsm.csi.seguranca.node;
 
+import br.ufsm.csi.seguranca.Main;
 import br.ufsm.csi.seguranca.pila.network.TCPClient;
 import br.ufsm.csi.seguranca.pila.network.TCPClientObserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +30,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  *
@@ -67,6 +73,8 @@ public class NodeJSListener implements TCPClientObserver
     }
 
     
+    private MqttClient mqttClient;
+    
     
     
     private Map<String, Map<OperationType, Route>> routeMapMap = new HashMap<>();
@@ -89,11 +97,56 @@ public class NodeJSListener implements TCPClientObserver
     private TCPClient tcpClient;
     private int writeCommandCount = 1;
     
-    public NodeJSListener(String packageName, TCPClient tCPClient)
+    public NodeJSListener(String packageName)
     {
-        SetUpRoutes(packageName);
-        this.tcpClient = tCPClient;
-        this.tcpClient.AddObserver(this);
+        try {
+            SetUpRoutes(packageName);
+            //this.tcpClient.AddObserver(this);
+            this.mqttClient = new MqttClient("tcp://192.168.90.208:1883", "java");
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setAutomaticReconnect(true);
+            options.setCleanSession(true);
+            options.setConnectionTimeout(10);
+            mqttClient.connect(options);
+            
+           while(!mqttClient.isConnected())
+           {
+               
+           }
+           mqttClient.subscribe("java/response");
+           mqttClient.subscribe("java/command", (topic, msg) -> {
+               
+                byte[] payload = msg.getPayload();
+                String json = new String(payload);
+                System.out.println(json);
+                this.OnMessage(null, msg);
+            });
+           
+            
+        } catch (MqttException ex) {
+            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void SendMessage(NodeJSMessage nodeJSMessage)
+    {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonString = objectMapper.writeValueAsString(nodeJSMessage);
+            MqttMessage mqttMessage = new MqttMessage(jsonString.getBytes());
+            
+            if(nodeJSMessage.getMessageType() == MessageType.COMMAND)
+            {
+                this.mqttClient.publish("master/command", mqttMessage);
+            }
+            else
+            {
+                this.mqttClient.publish("master/response", mqttMessage);
+            }
+        } catch (JsonProcessingException | MqttException ex) {
+            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     private void SetUpRoutes(String packageName)
@@ -180,13 +233,15 @@ public class NodeJSListener implements TCPClientObserver
             nodeJSMessage.setArg(jsonCommand);
             nodeJSMessage.setMessageType(MessageType.COMMAND);
             
-            String jsonMessage = objectMapper.writeValueAsString(nodeJSMessage);
+            this.SendMessage(nodeJSMessage);
+            
+           /* String jsonMessage = objectMapper.writeValueAsString(nodeJSMessage);
             
             String complete = jsonMessage + "\\r\\nEND\\r\\n";
             
             byte[] bytes = jsonMessage.getBytes();
             
-            this.tcpClient.getSocket().getOutputStream().write(bytes);
+            this.tcpClient.getSocket().getOutputStream().write(bytes);*/
         }
         catch (JsonProcessingException ex)
         {
@@ -409,11 +464,12 @@ public class NodeJSListener implements TCPClientObserver
 
                 NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.RESPONSE, jsonarg);
                 
-                
+                SendMessage(nodeJSMessage);
+                /*
                 String json = mapper.writeValueAsString(nodeJSMessage);
                 String complete = json + "\\r\\nEND\\r\\n";
                 byte[] bytes = complete.getBytes();
-                this.tcpClient.getSocket().getOutputStream().write(bytes);
+                this.tcpClient.getSocket().getOutputStream().write(bytes);*/
             }
             catch (IOException ex)
             {
