@@ -31,6 +31,6 @@ public class ValidationObserver implements PilaCoinValidatorManagerObserver
     public void OnFinishedValidation(PilaCoin pilaCoin)
     {
         SerializablePilaCoin serializablePilaCoin = SerializablePilaCoin.FromPilaCoin(pilaCoin);
-        this.nodeJSListener.WriteCommand("pilacoin/finished-validation", OperationType.WRITE, serializablePilaCoin);
+        this.nodeJSListener.WriteCommand    ("pilacoin/finished-validation", OperationType.WRITE, serializablePilaCoin);
     }
 }

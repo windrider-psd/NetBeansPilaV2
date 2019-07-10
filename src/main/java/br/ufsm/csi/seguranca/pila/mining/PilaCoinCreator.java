@@ -16,9 +16,8 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
-public class PilaCoinCreator implements Runnable
+public class PilaCoinCreator
 {
 
     private static String idCriador;
@@ -26,8 +25,45 @@ public class PilaCoinCreator implements Runnable
     private static final BigInteger maxMagicalNumber = new BigInteger("99999998000000000000000000000000000000000000000000000000000000000000000");
     private PilaCoin prototype;
     private static long magicalNumber = Long.MIN_VALUE;
-    private static HashSet<PilaCoinObserver> pilaCoinObservers = new HashSet<>();
-
+    private static final HashSet<PilaCoinObserver> pilaCoinObservers = new HashSet<>();
+    private boolean start = false;
+    private Thread thread;
+    
+    private PilaCoinCreator instance;
+    
+    public void Start()
+    {
+        if(start)
+        {
+            return;
+        }
+        synchronized(this)
+        {
+            if(thread == null || !thread.isAlive())
+            {
+                thread = new Thread(this.runnable);
+            }
+            start = true;
+            thread.start();
+        }
+    }
+    
+    public void Stop()
+    {
+        synchronized(this)
+        {
+            start = false;
+        }
+    }
+    
+    private boolean getStart()
+    {
+        synchronized(this)
+        {
+            return start;
+        }
+    }
+    
     public static void AddCreationObserver(PilaCoinObserver pilaCoinObserver)
     {
         synchronized (pilaCoinObservers)
@@ -64,22 +100,24 @@ public class PilaCoinCreator implements Runnable
         this.idCriador = idCriador;
         this.prototype = CreatePrototype();
         this.publicKey = publicKey;
+        this.instance = this;
     }
 
     private PilaCoin CreatePrototype()
     {
-        PilaCoin prototype = new PilaCoin();
-        prototype.setIdCriador(idCriador);
+        PilaCoin pilaCoin = new PilaCoin();
+        pilaCoin.setIdCriador(idCriador);
+        pilaCoin.setTransacoes(new ArrayList<>());
         try
         {
-            prototype.setAssinaturaMaster(RSAUtil.getMasterPublicKey().getEncoded());
-            prototype.setChaveCriador(PersonalCertificate.getInstance().getPublicKey());
+            pilaCoin.setAssinaturaMaster(RSAUtil.getMasterPublicKey().getEncoded());
+            pilaCoin.setChaveCriador(PersonalCertificate.getInstance().getPublicKey());
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return prototype;
+        return pilaCoin;
     }
 
     private static synchronized long CreateMagicalNumber()
@@ -89,45 +127,53 @@ public class PilaCoinCreator implements Runnable
         return magical;
     }
 
-    @Override
-    public void run()
-    {
-        while (true)
+    
+    private final Runnable runnable = new Runnable(){
+        @Override
+        public void run()
         {
-            PilaCoin pilaCoin;
-            byte[] hash = null;
-            do
+            while (getStart())
             {
-                Long magicalNumber = CreateMagicalNumber();
-                pilaCoin = (PilaCoin) prototype.clone();
-                pilaCoin.setDataCriacao(new Date());
-                pilaCoin.setNumeroMagico(magicalNumber);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                try
+                PilaCoin pilaCoin;
+                byte[] hash = null;
+                do
                 {
-                    SerializationUtils.SerializeObject(pilaCoin, byteArrayOutputStream);
-
-                    byte[] pilaBytes = byteArrayOutputStream.toByteArray();
-
-                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                    synchronized (digest)
+                    Long magicalNumber = CreateMagicalNumber();
+                    pilaCoin = (PilaCoin) prototype.clone();
+                    pilaCoin.setDataCriacao(new Date());
+                    pilaCoin.setNumeroMagico(magicalNumber);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    try
                     {
-                        hash = digest.digest(pilaBytes);
+                        SerializationUtils.SerializeObject(pilaCoin, byteArrayOutputStream);
+
+                        byte[] pilaBytes = byteArrayOutputStream.toByteArray();
+
+                        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                        synchronized (digest)
+                        {
+                            hash = digest.digest(pilaBytes);
+                        }
+
+                    }
+                    catch (IOException | NoSuchAlgorithmException ex)
+                    {
+                        ex.printStackTrace();
                     }
 
-                }
-                catch (IOException ex)
-                {
-                    ex.printStackTrace();
-                }
-                catch (NoSuchAlgorithmException e)
-                {
-                    e.printStackTrace();
-                }
-            } while (new BigInteger(1, hash).compareTo(maxMagicalNumber) >= 0);
-            
-            System.out.println("Found: " + magicalNumber);
-            CallObservers(this, pilaCoin);
+                } while (new BigInteger(1, hash).compareTo(maxMagicalNumber) >= 0);
+
+                System.out.println("Found: " + magicalNumber);
+                CallObservers(instance, pilaCoin);
+            }
         }
+        
+    };
+
+    
+    
+    public void run()
+    {
+        
     }
 }

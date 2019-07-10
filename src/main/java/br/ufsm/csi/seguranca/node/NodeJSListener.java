@@ -5,9 +5,6 @@
  */
 package br.ufsm.csi.seguranca.node;
 
-import br.ufsm.csi.seguranca.Main;
-import br.ufsm.csi.seguranca.pila.network.TCPClient;
-import br.ufsm.csi.seguranca.pila.network.TCPClientObserver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +14,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +26,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -39,23 +37,23 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
  *
  * @author politecnico
  */
-public class NodeJSListener implements TCPClientObserver
+public class NodeJSListener implements MqttCallback
 {
-    
-    @Override
-    public void OnMessage(TCPClient socket, Object obj)
+
+    private void OnMessage(String obj)
     {
+        //System.out.println(builtInMap.containsValue(Boolean.class));
         if (obj instanceof String)
         {
             try
             {
                 ObjectMapper objectMapper = new ObjectMapper();
-                NodeJSMessage message = objectMapper.readValue((String) obj, NodeJSMessage.class);
-                if(message.getMessageType() == MessageType.COMMAND)
+                NodeJSMessage message = objectMapper.readValue(obj, NodeJSMessage.class);
+                
+                if (message.getMessageType() == MessageType.COMMAND)
                 {
                     NodeJSCommand nodeJSCommand = objectMapper.readValue(message.getArg(), NodeJSCommand.class);
                     InvokeRoutes(nodeJSCommand.getCommandId(), nodeJSCommand.getCommandPath(), nodeJSCommand.getOperationType(), nodeJSCommand.getArg());
-                    
                 }
                 else
                 {
@@ -66,76 +64,60 @@ public class NodeJSListener implements TCPClientObserver
             {
                 System.out.println("Invalid Command: " + ex.getMessage());
             }
-            
+
         }
-        
-        
+
     }
 
-    
     private MqttClient mqttClient;
-    
-    
-    
+
     private Map<String, Map<OperationType, Route>> routeMapMap = new HashMap<>();
     private static Map< String, Class> builtInMap = new HashMap< String, Class>();
 
     
     {
-        builtInMap.put("int", Integer.TYPE);
-        builtInMap.put("long", Long.TYPE);
-        builtInMap.put("double", Double.TYPE);
-        builtInMap.put("float", Float.TYPE);
-        builtInMap.put("bool", Boolean.TYPE);
-        builtInMap.put("char", Character.TYPE);
-        builtInMap.put("byte", Byte.TYPE);
-        builtInMap.put("void", Void.TYPE);
-        builtInMap.put("short", Short.TYPE);
+        builtInMap.put("int", Integer.class);
+        builtInMap.put("long", Long.class);
+        builtInMap.put("double", Double.class);
+        builtInMap.put("float", Float.class);
+        builtInMap.put("bool", Boolean.class);
+        builtInMap.put("char", Character.class);
+        builtInMap.put("byte", Byte.class);
+        builtInMap.put("void", Void.class);
+        builtInMap.put("short", Short.class);
     }
 
     private boolean caseSentitiveCommands;
-    private TCPClient tcpClient;
     private int writeCommandCount = 1;
-    
-    public NodeJSListener(String packageName)
+    private int masterPort;
+    private String masterIPAdress;
+
+    public NodeJSListener(String controllersPackage, String masterIPAdress, int masterPort)
     {
-        try {
-            SetUpRoutes(packageName);
-            //this.tcpClient.AddObserver(this);
-            this.mqttClient = new MqttClient("tcp://192.168.90.208:1883", "java");
-            MqttConnectOptions options = new MqttConnectOptions();
-            options.setAutomaticReconnect(true);
-            options.setCleanSession(true);
-            options.setConnectionTimeout(10);
-            mqttClient.connect(options);
-            
-           while(!mqttClient.isConnected())
-           {
-               
-           }
-           mqttClient.subscribe("java/response");
-           mqttClient.subscribe("java/command", (topic, msg) -> {
-               
-                byte[] payload = msg.getPayload();
-                String json = new String(payload);
-                System.out.println(json);
-                this.OnMessage(null, msg);
-            });
-           
-            
-        } catch (MqttException ex) {
+        try
+        {
+            this.masterPort = masterPort;
+            this.masterIPAdress = masterIPAdress;
+
+            SetUpRoutes(controllersPackage);
+            this.Connect();
+
+        }
+        catch (MqttException ex)
+        {
             Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void SendMessage(NodeJSMessage nodeJSMessage)
     {
-        try {
+        try
+        {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonString = objectMapper.writeValueAsString(nodeJSMessage);
             MqttMessage mqttMessage = new MqttMessage(jsonString.getBytes());
-            
-            if(nodeJSMessage.getMessageType() == MessageType.COMMAND)
+
+            if (nodeJSMessage.getMessageType() == MessageType.COMMAND)
             {
                 this.mqttClient.publish("master/command", mqttMessage);
             }
@@ -143,7 +125,9 @@ public class NodeJSListener implements TCPClientObserver
             {
                 this.mqttClient.publish("master/response", mqttMessage);
             }
-        } catch (JsonProcessingException | MqttException ex) {
+        }
+        catch (JsonProcessingException | MqttException ex)
+        {
             Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -217,25 +201,25 @@ public class NodeJSListener implements TCPClientObserver
             ex.printStackTrace();
         }
     }
-    
+
     public void WriteCommand(String commandPath, OperationType operationType, Object arg)
     {
-        
+
         try
         {
             ObjectMapper objectMapper = new ObjectMapper();
             String argJson = objectMapper.writeValueAsString(arg);
             NodeJSCommand nodeJSCommand = new NodeJSCommand(writeCommandCount++, commandPath, operationType, argJson);
-            
+
             String jsonCommand = objectMapper.writeValueAsString(nodeJSCommand);
-            
+
             NodeJSMessage nodeJSMessage = new NodeJSMessage();
             nodeJSMessage.setArg(jsonCommand);
             nodeJSMessage.setMessageType(MessageType.COMMAND);
-            
+
             this.SendMessage(nodeJSMessage);
-            
-           /* String jsonMessage = objectMapper.writeValueAsString(nodeJSMessage);
+
+            /* String jsonMessage = objectMapper.writeValueAsString(nodeJSMessage);
             
             String complete = jsonMessage + "\\r\\nEND\\r\\n";
             
@@ -251,9 +235,9 @@ public class NodeJSListener implements TCPClientObserver
         {
             Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
         }
-       
+
     }
-    
+
     public void InvokeRoutes(int id, String command, OperationType operationType, String arg)
     {
 
@@ -289,7 +273,7 @@ public class NodeJSListener implements TCPClientObserver
                         {
                             Object obj;
                             obj = objectMapper.readValue(arg, parameter.getType());
-                            
+
                             respArg = route.InvokeRoute(obj);
                             responseStatus = ResponseStatus.OK;
                             System.out.println(respArg);
@@ -412,8 +396,8 @@ public class NodeJSListener implements TCPClientObserver
                                 responseStatus = ResponseStatus.INVALID;
                                 respArg = new NodeJSCommandError("NRT", "No route for " + command);
                             }*/
-                            
-                            if(valid)
+
+                            if (valid)
                             {
                                 respArg = route.InvokeRoute(returnedValue);
                                 responseStatus = ResponseStatus.OK;
@@ -450,35 +434,31 @@ public class NodeJSListener implements TCPClientObserver
             respArg = new NodeJSCommandError("CMP", "No command path for " + command);
         }
 
-        if (!this.tcpClient.getSocket().isClosed())
-        {
-            NodeJSCommandResponse nodeJSCommandResponse = new NodeJSCommandResponse();
-            nodeJSCommandResponse.setArg(respArg);
-            nodeJSCommandResponse.setResponseStatus(responseStatus);
-            nodeJSCommandResponse.setCommandId(id);
-            
-            try
-            {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonarg = mapper.writeValueAsString(nodeJSCommandResponse);
+        NodeJSCommandResponse nodeJSCommandResponse = new NodeJSCommandResponse();
+        nodeJSCommandResponse.setArg(respArg);
+        nodeJSCommandResponse.setResponseStatus(responseStatus);
+        nodeJSCommandResponse.setCommandId(id);
 
-                NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.RESPONSE, jsonarg);
-                
-                SendMessage(nodeJSMessage);
-                /*
+        try
+        {
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonarg = mapper.writeValueAsString(nodeJSCommandResponse);
+
+            NodeJSMessage nodeJSMessage = new NodeJSMessage(MessageType.RESPONSE, jsonarg);
+
+            SendMessage(nodeJSMessage);
+            /*
                 String json = mapper.writeValueAsString(nodeJSMessage);
                 String complete = json + "\\r\\nEND\\r\\n";
                 byte[] bytes = complete.getBytes();
                 this.tcpClient.getSocket().getOutputStream().write(bytes);*/
-            }
-            catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
         }
 
     }
-    
 
     private static boolean IsFromPrimitive(Class classz)
     {
@@ -547,26 +527,54 @@ public class NodeJSListener implements TCPClientObserver
         return classes;
     }
 
-  
+    private void Connect() throws MqttException
+    {
+        System.out.println("connecting");
+        this.mqttClient = new MqttClient("tcp://" + masterIPAdress + ":" + masterPort, "java");
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setAutomaticReconnect(true);
+        options.setCleanSession(true);
+        this.mqttClient.setCallback(this);
+        options.setConnectionTimeout(1);
+        mqttClient.connect(options);
+
+        mqttClient.subscribe("java/response", (topic, msg) ->
+        {
+            byte[] payload = msg.getPayload();
+            String json = new String(payload);
+            this.OnMessage(json);
+        });
+        mqttClient.subscribe("java/command", (topic, msg) ->
+        {
+            byte[] payload = msg.getPayload();
+            String json = new String(payload);
+            this.OnMessage(json);
+        });
+    }
 
     @Override
-    public void OnClosed(TCPClient client)
+    public void connectionLost(Throwable thrwbl)
+    {
+        try
+        {
+            this.Connect();
+        }
+        catch (MqttException ex)
+        {
+            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void messageArrived(String string, MqttMessage mm) throws Exception
     {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public TCPClient getTcpClient()
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken imdt)
     {
-        return tcpClient;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    public void setTcpClient(TCPClient tcpClient)
-    {
-        this.tcpClient = tcpClient;
-    }
-    
-    
-    
-    
 
 }

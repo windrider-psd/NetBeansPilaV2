@@ -6,7 +6,7 @@ import java.security.PublicKey;
 /**
  * Created by cpol on 19/04/2018.
  */
-public class Usuario {
+public class UsuarioServer {
 
     private String id;
     private PublicKey chavePublica;

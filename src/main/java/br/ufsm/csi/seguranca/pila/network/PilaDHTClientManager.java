@@ -44,14 +44,28 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
 
     private UDPBroadcaster userUDPBroadcaster;
 
-    public PilaDHTClientManager(String id, PilaCoinStorage pilaCoinStorage, Usuario usuario, UDPBroadcaster userUDPBroadcaster) {
+    private PilaDHTClientManager() {
+    }
+    
+    public void SetUp(String id, PilaCoinStorage pilaCoinStorage, Usuario usuario, UDPBroadcaster userUDPBroadcaster) {
         this.id = id;
         this.pilaCoinStorage = pilaCoinStorage;
         this.usuario = usuario;
         this.userUDPBroadcaster = userUDPBroadcaster;
     }
     
+    private static PilaDHTClientManager instance = null;
     
+    public static synchronized PilaDHTClientManager getInstance()
+    {
+        if(instance == null)
+        {
+            instance = new PilaDHTClientManager();
+        }
+        return instance;
+    }
+    
+  
     
     @Override
     public void OnPacket(DatagramPacket datagramPacket) {
@@ -142,8 +156,6 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
     public void OnMasterFound(InetAddress inetAddress, int port) {
         try {
             this.client = new PilaDHTClient(inetAddress.toString().substring(1), port, this.usuario);
-            Usuario u = this.client.getUsuario(this.id);
-            System.out.println(u.getId());
             
         } catch (IOException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);

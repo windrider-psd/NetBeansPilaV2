@@ -82,15 +82,6 @@ public class PilaCoinValidatorManager implements PilaCoinObserver, PilaCoinValid
     public void OnPilaCoinValidatorReady(PilaCoinValidator pilaCoinValidator) {
         System.out.println("Valid: " + pilaCoinValidator.getPilaCoin().getNumeroMagico());
         
-            Transacao t = new Transacao();
-            t.setAssinaturaDono(new byte[5]);
-            t.setDataTransacao(new Date());
-            t.setIdNovoDono("agaga");
-            
-            List<Transacao> a = new ArrayList<Transacao>();
-            a.add(t);
-            pilaCoinValidator.getPilaCoin().setTransacoes(a);
-        
         CallManagerObservers(pilaCoinValidator.getPilaCoin());
     }
 

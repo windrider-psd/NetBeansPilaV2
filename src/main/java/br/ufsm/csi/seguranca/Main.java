@@ -10,13 +10,12 @@ import br.ufsm.csi.seguranca.pila.Serialization.PilaCoinStorageSaver;
 import br.ufsm.csi.seguranca.pila.Serialization.PilaCoinBinaryStorage;
 import br.ufsm.csi.seguranca.pila.Serialization.PilaCoinStorage;
 import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
+import br.ufsm.csi.seguranca.pila.mining.MiningManager;
 import br.ufsm.csi.seguranca.pila.model.*;
-import br.ufsm.csi.seguranca.pila.network.TCPServer;
 import br.ufsm.csi.seguranca.pila.network.UDPBroadcaster;
 import br.ufsm.csi.seguranca.pila.network.UDPListener;
 import br.ufsm.csi.seguranca.util.RandomString;
 import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
-import br.ufsm.csi.seguranca.pila.network.TCPClient;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +26,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -45,11 +43,10 @@ public class Main
     public static String id;
     public static Usuario usuario;
     
-    public static final int numberOfCreatorThreads = 1;
-    public static final Thread[] pilaCoinCreatorThreads = new Thread[numberOfCreatorThreads];
+    private final static int numberOfCreatorThreads = 1;
 
-    public static final String certificateFileName = "certificate.per";
-    public static final File certificateFile = new File(certificateFileName);
+    private final static String certificateFileName = "certificate.per";
+    public static File certificateFile = new File(certificateFileName);
     
     public static UDPBroadcaster udpMasterBroadcaster;
     public static UDPListener udpMasterListener;
@@ -58,11 +55,10 @@ public class Main
     public static UDPListener udpUserListener;
     
     public static PilaCoinStorage pilaCoinStorage;
-    public static TCPServer tCPServer;
     
     public static InetAddress localhost;
     
-    public static PilaDHTClientManager clientManager; 
+    public static PilaDHTClientManager clientManager = PilaDHTClientManager.getInstance(); 
     
     public static User thisUser;
     
@@ -85,24 +81,24 @@ public class Main
         
         SetUpMining();
         
-        CreateUser();
-       // TCPClient tCPClient = new TCPClient(new Socket(getLocalHost(), 42228), 900000);
         
-        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers");
-        //tCPClient.StartListening();
+        NodeJSListener nodelistener = new NodeJSListener("br.ufsm.csi.seguranca.node.controllers", getLocalHost().toString().substring(1), 1883);
+        
         ValidationObserver validationObserver = new ValidationObserver(nodelistener);
         PilaCoinValidatorManager.getInstance().AddObserver(validationObserver);
+       
+       
         System.out.println("User Id: " + id);
-        System.out.println("TCPServer: " + tCPServer.getServerSocket().getInetAddress() + ":" + tCPServer.getServerSocket().getLocalPort());
         System.out.println("UDPMasterBroadcaster: " + udpMasterBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpMasterBroadcaster.getDatagramSocket().getLocalPort());
         System.out.println("UDPUserBroadcaster: " + udpUserBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpUserBroadcaster.getDatagramSocket().getLocalPort());
+        
+        
     }
 
     public static void CreateCertificate()
     {
         try {
-            KeyPairGenerator keyPairGenerator = null;
-            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             keyPairGenerator.initialize(1024);
            
             
@@ -125,12 +121,11 @@ public class Main
         ServerSocket serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(getLocalHost(), 0));
         
-        tCPServer = new TCPServer(serverSocket, 5012, 99999);
-        
         UserScout.getInstance().setId(id);
         
-        DatagramSocket userDatagramSocket = new DatagramSocket(5001);
+        DatagramSocket userDatagramSocket = new DatagramSocket();
         DatagramSocket masterDatagramSocket = new DatagramSocket();
+        //userDatagramSocket.bind(new InetSocketAddress(4000));
         
         MasterScout.getInstance().setPublicKey(PersonalCertificate.getInstance().getPublicKey());
         
@@ -145,8 +140,8 @@ public class Main
         //------------------------------------//
         
         udpUserListener = new UDPListener(userDatagramSocket, 5012);
-        Mensagem userMessage = UserScout.getInstance().CreateMessage(id, tCPServer.getServerSocket().getInetAddress(), PersonalCertificate.getInstance().getPublicKey(), tCPServer.getServerSocket().getLocalPort());
-        udpUserBroadcaster = new UDPBroadcaster(userDatagramSocket, userMessage, InetAddress.getByName("255.255.255.255"), userDatagramSocket.getLocalPort(), 15000);
+        Mensagem userMessage = UserScout.getInstance().CreateMessage(id, getLocalHost(), PersonalCertificate.getInstance().getPublicKey(), 4000);
+        udpUserBroadcaster = new UDPBroadcaster(userDatagramSocket, userMessage, InetAddress.getByName("255.255.255.255"), 3333, 15000);
         
         udpMasterListener.AddObserver(UserScout.getInstance());
         udpMasterBroadcaster.AddObserver(UserScout.getInstance());
@@ -156,21 +151,28 @@ public class Main
         
         udpMasterListener.Start();
         udpMasterBroadcaster.Start();
-        tCPServer.StartListening();
     }
     
     private static void SetUpDHT()
     {
-        usuario = new Usuario();
-        usuario.setChavePublica(PersonalCertificate.getInstance().getPublicKey());
-        usuario.setId(id);
-        usuario.setMeusPilas(new HashSet<>(Arrays.asList(pilaCoinStorage.GetAll())));
-        usuario.setEndereco(tCPServer.getServerSocket().getInetAddress());
-        
-        clientManager = new PilaDHTClientManager(id, pilaCoinStorage, usuario, udpUserBroadcaster);
-        MasterScout.getInstance().AddObserver(clientManager);
-        PilaCoinValidatorManager.getInstance().AddObserver(clientManager);
-        udpUserListener.AddObserver(clientManager);
+        try
+        {
+            usuario = new Usuario();
+            usuario.setChavePublica(PersonalCertificate.getInstance().getPublicKey());
+            usuario.setId(id);
+            usuario.setMeusPilas(new HashSet<>(Arrays.asList(pilaCoinStorage.GetAll())));
+            usuario.setEndereco(getLocalHost());
+            
+            clientManager.SetUp(id, pilaCoinStorage, usuario, udpUserBroadcaster);
+            
+            MasterScout.getInstance().AddObserver(clientManager);
+            PilaCoinValidatorManager.getInstance().AddObserver(clientManager);
+            //udpUserListener.AddObserver(clientManager);
+        }
+        catch (SocketException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
     
@@ -178,7 +180,7 @@ public class Main
     {
         try {
             pilaCoinStorage = new PilaCoinBinaryStorage("pila_coin_storage.pc", true);
-            //pilaCoinStorage.Clear();
+           // pilaCoinStorage.Clear();
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -186,14 +188,8 @@ public class Main
     
     private static void SetUpMining()
     {
-        for(int i = 0; i < numberOfCreatorThreads; i++)
-        {
-            pilaCoinCreatorThreads[i] = new Thread(new PilaCoinCreator(id, PersonalCertificate.getInstance().getPublicKey()));
-        }
-        for(int i = 0; i < numberOfCreatorThreads; i++)
-        {
-            pilaCoinCreatorThreads[i].start();
-        }
+        MiningManager.getInstance().SetUpCreators(2);
+        MiningManager.getInstance().StartMining();
     }
     
     private static void CreateId()
@@ -231,10 +227,19 @@ public class Main
     
     private static void CreateUser()
     {
-        User user = new User();
-        user.setId(id);
-        user.setInetAddress(tCPServer.getServerSocket().getInetAddress());
-        user.setPublicKey(PersonalCertificate.getInstance().getPublicKey());
-        Main.thisUser = user;
+        try
+        {
+            User user = new User();
+            user.setId(id);
+            user.setInetAddress(getLocalHost());
+            user.setPublicKey(PersonalCertificate.getInstance().getPublicKey());
+            Main.thisUser = user;
+        }
+        catch (SocketException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+    
+    
 }
