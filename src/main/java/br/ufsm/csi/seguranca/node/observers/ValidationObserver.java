@@ -8,6 +8,8 @@ package br.ufsm.csi.seguranca.node.observers;
 import br.ufsm.csi.seguranca.node.NodeJSListener;
 import br.ufsm.csi.seguranca.node.OperationType;
 import br.ufsm.csi.seguranca.node.models.SerializablePilaCoin;
+import br.ufsm.csi.seguranca.pila.mining.PilaCoinCreator;
+import br.ufsm.csi.seguranca.pila.mining.PilaCoinObserver;
 import br.ufsm.csi.seguranca.pila.model.PilaCoin;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManagerObserver;
 
@@ -31,6 +33,7 @@ public class ValidationObserver implements PilaCoinValidatorManagerObserver
     public void OnFinishedValidation(PilaCoin pilaCoin)
     {
         SerializablePilaCoin serializablePilaCoin = SerializablePilaCoin.FromPilaCoin(pilaCoin);
-        this.nodeJSListener.WriteCommand    ("pilacoin/finished-validation", OperationType.WRITE, serializablePilaCoin);
+        this.nodeJSListener.WriteCommand("pilacoin/finished-validation", OperationType.WRITE, serializablePilaCoin);
     }
+
 }

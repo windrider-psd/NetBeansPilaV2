@@ -24,7 +24,7 @@ public class PilaCoinCreator
     private PublicKey publicKey;
     private static final BigInteger maxMagicalNumber = new BigInteger("99999998000000000000000000000000000000000000000000000000000000000000000");
     private PilaCoin prototype;
-    private static long magicalNumber = Long.MIN_VALUE;
+    public static long magicalNumber = Long.MIN_VALUE;
     private static final HashSet<PilaCoinObserver> pilaCoinObservers = new HashSet<>();
     private boolean start = false;
     private Thread thread;
@@ -33,18 +33,23 @@ public class PilaCoinCreator
     
     public void Start()
     {
-        if(start)
-        {
-            return;
-        }
         synchronized(this)
         {
+            if(start)
+            {
+                return;
+            }
+            
             if(thread == null || !thread.isAlive())
             {
                 thread = new Thread(this.runnable);
             }
             start = true;
-            thread.start();
+            if(!thread.isAlive())
+            {
+                thread.start();
+            }
+            
         }
     }
     

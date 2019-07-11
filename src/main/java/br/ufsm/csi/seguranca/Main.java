@@ -5,7 +5,6 @@ import br.ufsm.csi.seguranca.node.observers.ValidationObserver;
 import br.ufsm.csi.seguranca.pila.scouting.UserScout;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 import br.ufsm.csi.seguranca.pila.scouting.MasterScout;
-import br.ufsm.csi.seguranca.pila.mining.PilaCoinCreator;
 import br.ufsm.csi.seguranca.pila.Serialization.PilaCoinStorageSaver;
 import br.ufsm.csi.seguranca.pila.Serialization.PilaCoinBinaryStorage;
 import br.ufsm.csi.seguranca.pila.Serialization.PilaCoinStorage;
@@ -89,8 +88,7 @@ public class Main
        
        
         System.out.println("User Id: " + id);
-        System.out.println("UDPMasterBroadcaster: " + udpMasterBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpMasterBroadcaster.getDatagramSocket().getLocalPort());
-        System.out.println("UDPUserBroadcaster: " + udpUserBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpUserBroadcaster.getDatagramSocket().getLocalPort());
+        System.out.println("UPbroadcaster: " + udpMasterBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpMasterBroadcaster.getDatagramSocket().getLocalPort());
         
         
     }
@@ -123,15 +121,16 @@ public class Main
         
         UserScout.getInstance().setId(id);
         
-        DatagramSocket userDatagramSocket = new DatagramSocket();
-        DatagramSocket masterDatagramSocket = new DatagramSocket();
+        //DatagramSocket userDatagramSocket = new DatagramSocket();
+        DatagramSocket broadcastSocket = new DatagramSocket(3333);
+        broadcastSocket.setBroadcast(true);
         //userDatagramSocket.bind(new InetSocketAddress(4000));
         
         MasterScout.getInstance().setPublicKey(PersonalCertificate.getInstance().getPublicKey());
         
-        udpMasterListener = new UDPListener(masterDatagramSocket, 5012);
-        Mensagem masterMessage = MasterScout.getInstance().CreateMessage(id, masterDatagramSocket.getLocalAddress(), PersonalCertificate.getInstance().getPublicKey(), masterDatagramSocket.getLocalPort());
-        udpMasterBroadcaster = new UDPBroadcaster(masterDatagramSocket, masterMessage, InetAddress.getByName("192.168.90.194"), 3333, 15000);
+        udpMasterListener = new UDPListener(broadcastSocket, 5012);
+        Mensagem masterMessage = MasterScout.getInstance().CreateMessage(id, broadcastSocket.getLocalAddress(), PersonalCertificate.getInstance().getPublicKey(), broadcastSocket.getLocalPort());
+        udpMasterBroadcaster = new UDPBroadcaster(broadcastSocket, masterMessage, InetAddress.getByName("192.168.90.194"), 3333, 15000);
         
         udpMasterListener.AddObserver(MasterScout.getInstance());
         udpMasterBroadcaster.AddObserver(MasterScout.getInstance());
@@ -139,14 +138,14 @@ public class Main
         
         //------------------------------------//
         
-        udpUserListener = new UDPListener(userDatagramSocket, 5012);
+       // udpUserListener = new UDPListener(userDatagramSocket, 5012);
         Mensagem userMessage = UserScout.getInstance().CreateMessage(id, getLocalHost(), PersonalCertificate.getInstance().getPublicKey(), 4000);
-        udpUserBroadcaster = new UDPBroadcaster(userDatagramSocket, userMessage, InetAddress.getByName("255.255.255.255"), 3333, 15000);
+        udpUserBroadcaster = new UDPBroadcaster(broadcastSocket, userMessage, InetAddress.getByName("255.255.255.255"), 3333, 15000);
         
         udpMasterListener.AddObserver(UserScout.getInstance());
-        udpMasterBroadcaster.AddObserver(UserScout.getInstance());
+        udpUserBroadcaster.AddObserver(UserScout.getInstance());
         
-        udpUserListener.Start();
+        //udpUserListener.Start();
         udpUserBroadcaster.Start();    
         
         udpMasterListener.Start();
@@ -180,7 +179,7 @@ public class Main
     {
         try {
             pilaCoinStorage = new PilaCoinBinaryStorage("pila_coin_storage.pc", true);
-           // pilaCoinStorage.Clear();
+            pilaCoinStorage.Clear();
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -188,7 +187,7 @@ public class Main
     
     private static void SetUpMining()
     {
-        MiningManager.getInstance().SetUpCreators(2);
+        MiningManager.getInstance().SetUpCreators(1);
         MiningManager.getInstance().StartMining();
     }
     

@@ -155,11 +155,9 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
     @Override
     public void OnMasterFound(InetAddress inetAddress, int port) {
         try {
-            this.client = new PilaDHTClient(inetAddress.toString().substring(1), port, this.usuario);
+            this.client = new PilaDHTClient(inetAddress.toString().substring(1), 4001, this.usuario);
             
-        } catch (IOException ex) {
-            Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -227,6 +225,8 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
     public void setUserUDPBroadcaster(UDPBroadcaster userUDPBroadcaster) {
         this.userUDPBroadcaster = userUDPBroadcaster;
     }
+    
+    
     
     
     

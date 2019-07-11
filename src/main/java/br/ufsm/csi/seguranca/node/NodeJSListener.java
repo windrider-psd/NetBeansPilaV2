@@ -5,6 +5,7 @@
  */
 package br.ufsm.csi.seguranca.node;
 
+import br.ufsm.csi.seguranca.NodeCallback;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -399,12 +400,13 @@ public class NodeJSListener implements MqttCallback
 
                             if (valid)
                             {
-                                respArg = route.InvokeRoute(returnedValue);
+                                //respArg = route.InvokeRoute(returnedValue);
+                                respArg = returnedValue;
                                 responseStatus = ResponseStatus.OK;
                             }
                             else
                             {
-                                respArg = route.InvokeRoute(new NodeJSCommandError("IARG", "Invalid arg"));
+                                respArg = new NodeJSCommandError("IARG", "Invalid arg");
                                 responseStatus = ResponseStatus.INVALID;
                             }
                         }
@@ -534,7 +536,7 @@ public class NodeJSListener implements MqttCallback
         MqttConnectOptions options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);
         options.setCleanSession(true);
-        this.mqttClient.setCallback(this);
+        this.mqttClient.setCallback(NodeCallback.getInstance());
         options.setConnectionTimeout(1);
         mqttClient.connect(options);
 

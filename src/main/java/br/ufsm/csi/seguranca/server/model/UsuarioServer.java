@@ -1,38 +1,41 @@
 package br.ufsm.csi.seguranca.server.model;
 
-import java.net.InetAddress;
-import java.security.PublicKey;
+import br.ufsm.csi.seguranca.pila.model.Usuario;
+
+import java.io.Serializable;
 
 /**
  * Created by cpol on 19/04/2018.
  */
-public class UsuarioServer {
+public class UsuarioServer extends Usuario implements Serializable {
 
-    private String id;
-    private PublicKey chavePublica;
-    private InetAddress endereco;
+    private static final long serialVersionUID = 2L;
+    private boolean msgDiscoverOk;
+    private boolean validacaoPilaOk;
+    private boolean pilaTransfOk;
 
-    public String getId() {
-        return id;
+    public boolean isMsgDiscoverOk() {
+        return msgDiscoverOk;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setMsgDiscoverOk(boolean msgDiscoverOk) {
+        this.msgDiscoverOk = msgDiscoverOk;
     }
 
-    public PublicKey getChavePublica() {
-        return chavePublica;
+    public boolean isValidacaoPilaOk() {
+        return validacaoPilaOk;
     }
 
-    public void setChavePublica(PublicKey chavePublica) {
-        this.chavePublica = chavePublica;
+    public void setValidacaoPilaOk(boolean validacaoPilaOk) {
+        this.validacaoPilaOk = validacaoPilaOk;
     }
 
-    public InetAddress getEndereco() {
-        return endereco;
+    public boolean isPilaTransfOk() {
+        return pilaTransfOk;
     }
 
-    public void setEndereco(InetAddress endereco) {
-        this.endereco = endereco;
+    public void setPilaTransfOk(boolean pilaTransfOk) {
+        this.pilaTransfOk = pilaTransfOk;
     }
+
 }

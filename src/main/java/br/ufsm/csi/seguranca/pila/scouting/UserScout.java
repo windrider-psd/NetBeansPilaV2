@@ -3,6 +3,7 @@ package br.ufsm.csi.seguranca.pila.scouting;
 import br.ufsm.csi.seguranca.pila.model.User;
 import br.ufsm.csi.seguranca.pila.Serialization.SerializationUtils;
 import br.ufsm.csi.seguranca.pila.model.Mensagem;
+import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
 import br.ufsm.csi.seguranca.pila.network.UDPBroadcasterObserver;
 import br.ufsm.csi.seguranca.pila.network.UDPListenerObserver;
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
             {
                 System.out.println("Found user: " + mensagem.getIdOrigem());
                 User user = new User(mensagem.getIdOrigem(), mensagem.getEndereco(), mensagem.getChavePublica());
+                
                 CallObservers(user);
             }
         } catch (IOException | ClassNotFoundException ex) {

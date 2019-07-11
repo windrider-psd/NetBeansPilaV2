@@ -96,7 +96,11 @@ public class UDPBroadcaster implements Runnable{
     public void BroadcastSingle(byte[] buffer, boolean callObservers) throws IOException
     {
         DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, broadcastAddress, broadcastPort);
-        datagramSocket.send(datagramPacket);
+        synchronized(this.getClass())
+        {
+            datagramSocket.send(datagramPacket);
+        }
+        
         CallObservers(datagramPacket);
     }
     
