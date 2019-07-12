@@ -16,7 +16,6 @@ import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidator;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -29,18 +28,25 @@ public class PilaCoinController
 {
 
     @NodeJSControllerRoute(CommandPath = "pilacoin/storage", OperationType = OperationType.READ)
-    public List<SerializablePilaCoin> getStorage() throws IOException, ClassNotFoundException
+    public List<SerializablePilaCoin> getStorage() throws IOException, ClassNotFoundException, Exception
     {
-        List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
         
-       // List<PilaCoin> pilaCoins = Arrays.asList(Main.pilaCoinStorage.GetAll());
-        Set<PilaCoin> pilaCoins = PilaDHTClientManager.getInstance().getClient().getUsuario(Main.id).getMeusPilas();
+        if(PilaDHTClientManager.getInstance().getClient() != null)
+        {
+            List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
         
-        pilaCoins.forEach(pilaCoin -> {
-            serializablePilaCoins.add(SerializablePilaCoin.FromPilaCoin(pilaCoin));
-        });
-        return serializablePilaCoins;
-       
+            // List<PilaCoin> pilaCoins = Arrays.asList(Main.pilaCoinStorage.GetAll());
+             Set<PilaCoin> pilaCoins = PilaDHTClientManager.getInstance().getClient().getUsuario(Main.id).getMeusPilas();
+
+             pilaCoins.forEach(pilaCoin -> {
+                 serializablePilaCoins.add(SerializablePilaCoin.FromPilaCoin(pilaCoin));
+             });
+             return serializablePilaCoins;
+        }
+        else
+        {
+            throw new Exception("DHT Client is not ready.");
+        }
     }
     
     @NodeJSControllerRoute(CommandPath = "pilacoin/schedule", OperationType = OperationType.READ)

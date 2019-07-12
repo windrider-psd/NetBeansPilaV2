@@ -24,6 +24,11 @@ public class NodeJSCommandError
     {
         return new NodeJSCommandError(ex.getClass().getSimpleName(), ex.getMessage());
     }
+    
+    public static NodeJSCommandError FromException(Throwable ex)
+    {
+        return new NodeJSCommandError(ex.getClass().getSimpleName(), ex.getMessage());
+    }
 
     public String getCode()
     {

@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -139,7 +140,7 @@ public class NodeJSListener implements MqttCallback
         try
         {
             Set<Class> classes = new HashSet<>(Arrays.asList(getClasses(packageName)));
-            System.out.println(classes.size());
+            //System.out.println(getClassesInPackage(packageName));
             classes.stream().filter(c ->
             {
                 Annotation[] annotations = c.getAnnotations();
@@ -230,10 +231,6 @@ public class NodeJSListener implements MqttCallback
             this.tcpClient.getSocket().getOutputStream().write(bytes);*/
         }
         catch (JsonProcessingException ex)
-        {
-            Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (IOException ex)
         {
             Logger.getLogger(NodeJSListener.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -427,7 +424,7 @@ public class NodeJSListener implements MqttCallback
                 catch (InvocationTargetException ex)
                 {
                     responseStatus = ResponseStatus.ERROR;
-                    respArg = NodeJSCommandError.FromException((Exception) ex.getTargetException());
+                    respArg = NodeJSCommandError.FromException(ex.getTargetException());
                 }
             }
         }
@@ -491,13 +488,15 @@ public class NodeJSListener implements MqttCallback
     {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
+        
         String path = packageName.replace('.', '/');
         Enumeration resources = classLoader.getResources(path);
         List dirs = new ArrayList();
         while (resources.hasMoreElements())
         {
             URL resource = (URL) resources.nextElement();
-            dirs.add(new File(resource.getFile()));
+            String filePath = URLDecoder.decode(resource.getFile(), "UTF-8");
+            dirs.add(new File(filePath));
         }
         ArrayList classes = new ArrayList();
         for (Object directory : dirs)
@@ -510,13 +509,16 @@ public class NodeJSListener implements MqttCallback
     static List findClasses(File directory, String packageName) throws ClassNotFoundException
     {
         List classes = new ArrayList();
+        
         if (!directory.exists())
         {
             return classes;
         }
         File[] files = directory.listFiles();
+        
         for (File file : files)
         {
+            
             if (file.isDirectory())
             {
                 assert !file.getName().contains(".");

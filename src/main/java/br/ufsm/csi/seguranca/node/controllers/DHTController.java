@@ -1,4 +1,4 @@
-/*
+*/
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -9,10 +9,7 @@ import br.ufsm.csi.seguranca.node.NodeJSController;
 import br.ufsm.csi.seguranca.node.NodeJSControllerRoute;
 import br.ufsm.csi.seguranca.node.OperationType;
 import br.ufsm.csi.seguranca.node.models.SellInfo;
-import br.ufsm.csi.seguranca.pila.model.PilaCoin;
 import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
-import br.ufsm.csi.seguranca.pilacoin.PilaDHTClient;
-import java.util.List;
 
 /**
  *
