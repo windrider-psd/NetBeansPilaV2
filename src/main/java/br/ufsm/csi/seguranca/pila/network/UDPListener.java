@@ -19,7 +19,7 @@ public class UDPListener implements Runnable{
     private int bufferSize;
     
     private Thread thread;
-    private boolean stop = false;
+    private boolean start = false;
     
     private Set<UDPListenerObserver> observers = new HashSet<>();
     
@@ -65,7 +65,7 @@ public class UDPListener implements Runnable{
             }
             catch(Exception ex)
             {
-                
+                ex.printStackTrace();
             }
         });
     }
@@ -74,7 +74,7 @@ public class UDPListener implements Runnable{
     {
         synchronized(this)
         {
-            if(!stop)
+            if(start)
             {
                 return;
             }
@@ -83,7 +83,7 @@ public class UDPListener implements Runnable{
             {
                 thread = new Thread(this);
             }
-            stop = false;
+            start = true;
             if(!thread.isAlive())
             {
                 thread.start();
@@ -94,14 +94,14 @@ public class UDPListener implements Runnable{
     public void Stop(){
         synchronized(this)
         {
-            stop = true;
+            start = false;
         }
         
     }
 
     @Override
     public void run() {
-        while(!stop)
+        while(start)
         {
             try
             {

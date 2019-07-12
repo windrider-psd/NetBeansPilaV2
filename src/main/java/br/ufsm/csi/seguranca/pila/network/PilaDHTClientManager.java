@@ -135,6 +135,7 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
                 mensagem.setTipo(Mensagem.TipoMensagem.PILA_TRANSF);
                 
                 userUDPBroadcaster.BroadcastSingle(mensagem, true);
+                this.client.setPilaCoin(pilaCoin);
                 CallObserversSell(pilaCoin);
                 this.pilaCoinStorage.Remove(pilaCoin);
             }
@@ -197,7 +198,6 @@ public class PilaDHTClientManager implements UDPListenerObserver, MasterScoutObs
     public void OnMasterFound(InetAddress inetAddress, int port) {
         try {
             this.client = new PilaDHTClient(inetAddress.toString().substring(1), 4001, this.usuario);
-            
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(PilaDHTClientManager.class.getName()).log(Level.SEVERE, null, ex);
         }

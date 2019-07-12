@@ -33,7 +33,11 @@ public class SerializableUser
     {
         SerializableUser serializableUser = new SerializableUser();
         serializableUser.setId(user.getId());
-        serializableUser.setInetAddress(user.getInetAddress().toString());
+        if(user.getInetAddress() != null)
+        {
+            serializableUser.setInetAddress(user.getInetAddress().toString());
+        }
+        
         serializableUser.setPublicKey(Base64.getEncoder().encodeToString(user.getPublicKey().getEncoded()));
         return serializableUser;
     }

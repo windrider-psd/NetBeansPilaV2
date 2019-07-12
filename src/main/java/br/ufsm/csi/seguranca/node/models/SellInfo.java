@@ -14,6 +14,12 @@ public class SellInfo
     private Long pilaCoinId;
     private String targetId;
 
+    public SellInfo()
+    {
+    }
+
+    
+    
     public SellInfo(Long pilaCoinId, String targetId)
     {
         this.pilaCoinId = pilaCoinId;

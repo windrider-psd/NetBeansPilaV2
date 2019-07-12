@@ -31,7 +31,7 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
             try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data)) {
                 mensagem = (Mensagem) SerializationUtils.DeserializeObject(byteArrayInputStream);
             }
-            
+
             if(IsValidMessage(mensagem))
             {
                 System.out.println("Found user: " + mensagem.getIdOrigem());
@@ -105,10 +105,17 @@ public class UserScout implements UDPListenerObserver, UDPBroadcasterObserver
     }
     private boolean IsValidMessage(Mensagem message)
     {
-        
-        return !message.getIdOrigem().equals(id) && message.getTipo() == Mensagem.TipoMensagem.DISCOVER
+        try
+        {
+            return !message.getIdOrigem().equals(id) && message.getTipo() == Mensagem.TipoMensagem.DISCOVER
                 && message.getIdOrigem() != null && message.isMaster() == false
-                && message.getEndereco() != null && message.getChavePublica() != null;
+                 && message.getChavePublica() != null;
+        }
+        catch(NullPointerException ex)
+        {
+            return false;
+        }
+        
     }
 
     @Override

@@ -13,11 +13,11 @@ import br.ufsm.csi.seguranca.pila.mining.MiningManager;
 import br.ufsm.csi.seguranca.pila.model.*;
 import br.ufsm.csi.seguranca.pila.network.UDPBroadcaster;
 import br.ufsm.csi.seguranca.pila.network.UDPListener;
-import br.ufsm.csi.seguranca.util.RandomString;
 import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
 import br.ufsm.csi.seguranca.pila.scouting.UserDatabase;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
-import java.util.Random;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -95,20 +95,33 @@ public class Main
     public static void CreateCertificate()
     {
         try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(1024);
-           
-            
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            PersonalCertificate.getInstance().setPublicKey(keyPair.getPublic());
-            PersonalCertificate.getInstance().setPrivateKey(keyPair.getPrivate());
-            
-            try (FileOutputStream fileOutputStream = new FileOutputStream(certificateFile)) {
-                SerializationUtils.SerializeObject(PersonalCertificate.getInstance(), fileOutputStream);
+            if(!certificateFile.exists())
+            {
+                KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+                keyPairGenerator.initialize(1024);
+
+
+                KeyPair keyPair = keyPairGenerator.generateKeyPair();
+                PersonalCertificate.getInstance().setPublicKey(keyPair.getPublic());
+                PersonalCertificate.getInstance().setPrivateKey(keyPair.getPrivate());
+
+                try (FileOutputStream fileOutputStream = new FileOutputStream(certificateFile)) {
+                    SerializationUtils.SerializeObject(PersonalCertificate.getInstance(), fileOutputStream);
+                }
             }
+            else
+            {
+                FileInputStream fileInputStream = new FileInputStream(certificateFile);
+                
+                PersonalCertificate savedPersonalCertificate = (PersonalCertificate) SerializationUtils.DeserializeObject(fileInputStream);
+                
+                PersonalCertificate.getInstance().setPublicKey(savedPersonalCertificate.getPublicKey());
+                PersonalCertificate.getInstance().setPrivateKey(savedPersonalCertificate.getPrivateKey());
+            }
+ 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException | NoSuchAlgorithmException ex) {
+        } catch (IOException | NoSuchAlgorithmException | ClassNotFoundException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -153,7 +166,7 @@ public class Main
             usuario = new Usuario();
             usuario.setChavePublica(PersonalCertificate.getInstance().getPublicKey());
             usuario.setId(id);  
-            //usuario.setMeusPilas(new HashSet<>(Arrays.asList(pilaCoinStorage.GetAll())));
+            usuario.setMeusPilas(new HashSet<>());
             usuario.setEndereco(getLocalHost());
             
             clientManager.SetUp(id, pilaCoinStorage, usuario, udpUserBroadcaster);
@@ -187,8 +200,9 @@ public class Main
     
     private static void CreateId()
     {
-        RandomString randomString = new RandomString(15, new Random());
-        id = randomString.nextString();
+        //RandomString randomString = new RandomString(15, new Random());
+        //id = randomString.nextString();
+        id = "Christian<script>alert('kiss ( ˘ ³˘)♥')</script>";
     }
     
     private static void SetUpValidator()

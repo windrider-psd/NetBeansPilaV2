@@ -132,9 +132,6 @@ public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
                 }
 
             }
-            else if(ready) {
-                setReady(false);
-            }
         }
         catch(Exception ex)
         {

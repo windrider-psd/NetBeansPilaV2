@@ -35,7 +35,20 @@ public class UserDatabase implements UserScoutObserver
     @Override
     public void OnUserFound(User user)
     {
-        users.add(user);
+        boolean repeated = false;
+        for(User u : this.users)
+        {
+            if(u.getId().equals(user.getId()))
+            {
+                repeated = true;
+                break;
+            }
+        }
+        if(!repeated)
+        {
+            users.add(user);
+        }
+        
     }
 
     public Set<User> getUsers()

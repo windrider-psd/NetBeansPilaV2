@@ -30,7 +30,7 @@ public class UDPBroadcaster implements Runnable
 
     private byte[] serializedBroadcastMessage = new byte[1];
     private Thread thread;
-    private boolean stop = true;
+    private boolean start = false;
 
     private Set<UDPBroadcasterObserver> observers = new HashSet<>();
 
@@ -51,7 +51,7 @@ public class UDPBroadcaster implements Runnable
     {
         synchronized (this)
         {
-            if (!stop)
+            if (start)
             {
                 return;
             }
@@ -60,7 +60,7 @@ public class UDPBroadcaster implements Runnable
             {
                 thread = new Thread(this);
             }
-            stop = false;
+            start = true;
             if (!thread.isAlive())
             {
                 thread.start();
@@ -73,14 +73,14 @@ public class UDPBroadcaster implements Runnable
     {
         synchronized (this)
         {
-            stop = true;
+            start = true;
         }
     }
 
     @Override
     public void run()
     {
-        while (!stop)
+        while (start)
         {
             try
             {
