@@ -117,6 +117,8 @@ public class Main
                 
                 PersonalCertificate.getInstance().setPublicKey(savedPersonalCertificate.getPublicKey());
                 PersonalCertificate.getInstance().setPrivateKey(savedPersonalCertificate.getPrivateKey());
+                
+                fileInputStream.close();
             }
  
         } catch (FileNotFoundException ex) {
