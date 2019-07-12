@@ -1,55 +1,62 @@
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\PilaDHTClientManager.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\server\model\UsuarioServer.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSCommandError.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSListenerMessageManagerObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSControllerRoute.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\Main.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\observers\ValidationObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\PersonalCertificate.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPBroadcaster.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\User.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSListener.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSMessage.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\Transacao.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\Mensagem.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPServer.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPClientObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPBroadcasterObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\models\SerializablePilaCoin.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\mining\PilaCoinObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPListenerObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorManagerObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\PilaCoin.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\MasterScout.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSListenerMessageManager.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\PilaCoinController.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\models\SerializableUser.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\MasterScoutObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\MiningController.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSController.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPListener.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorManager.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorageSaver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\util\RSAUtil.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\UserScout.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorage.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\SerializationUtils.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\Route.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinBinaryStorage.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\ResponseStatus.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\UserDataController.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\MessageType.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\ObjetoTroca.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSCommand.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSCommandResponse.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\OperationType.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\util\RandomString.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\MensagemFragmentada.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidator.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPServerObserver.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\mining\PilaCoinCreator.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPClient.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pilacoin\PilaDHTClient.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\Usuario.java
-C:\Users\politecnico\Desktop\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\UserScoutObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\models\SerializableUser.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSControllerRoute.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pilacoin\PilaDHTClient.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\server\model\UsuarioServer.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSListener.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSMessage.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\OperationType.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorage.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSCommand.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\User.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSListenerMessageManager.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPBroadcaster.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorManager.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSCommandError.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\PilaDHTClientManagerObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\MasterScoutObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPServerObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\DHTController.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPBroadcasterObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSCommandResponse.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\PersonalCertificate.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\MensagemFragmentada.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\observers\ValidationObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\mining\PilaCoinObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\SerializationUtils.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\Route.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\PilaCoin.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\Main.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPClientObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\ObjetoTroca.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\util\RSAUtil.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSController.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPListener.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorManagerObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\PilaCoinController.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\PilaDHTClientManager.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPServer.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\util\RandomString.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\Transacao.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidatorObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\mining\PilaCoinCreator.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\NodeJSListenerMessageManagerObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\mining\MiningManager.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\ResponseStatus.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\observers\DHTObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\UserScout.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\NodeCallback.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\models\MiningReport.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\MasterScout.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\models\SerializablePilaCoin.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\models\SellInfo.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\validation\PilaCoinValidator.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\Mensagem.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\model\Usuario.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\MessageType.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\UserDataController.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\node\controllers\MiningController.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\TCPClient.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinStorageSaver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\scouting\UserScoutObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\network\UDPListenerObserver.java
+C:\Users\Christian Lemos\Documents\GitHub\NetBeansPilaV2\src\main\java\br\ufsm\csi\seguranca\pila\Serialization\PilaCoinBinaryStorage.java

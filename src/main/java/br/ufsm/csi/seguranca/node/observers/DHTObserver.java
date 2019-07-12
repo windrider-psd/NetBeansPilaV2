@@ -8,32 +8,28 @@ package br.ufsm.csi.seguranca.node.observers;
 import br.ufsm.csi.seguranca.node.NodeJSListener;
 import br.ufsm.csi.seguranca.node.OperationType;
 import br.ufsm.csi.seguranca.node.models.SerializablePilaCoin;
-import br.ufsm.csi.seguranca.pila.mining.PilaCoinCreator;
-import br.ufsm.csi.seguranca.pila.mining.PilaCoinObserver;
 import br.ufsm.csi.seguranca.pila.model.PilaCoin;
-import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManagerObserver;
+import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManagerObserver;
 
 /**
  *
- * @author politecnico
+ * @author Christian Lemos
  */
-public class ValidationObserver implements PilaCoinValidatorManagerObserver
+public class DHTObserver implements PilaDHTClientManagerObserver
 {
-
     private final NodeJSListener nodeJSListener;
 
-    public ValidationObserver(NodeJSListener nodeJSListener)
+    public DHTObserver(NodeJSListener nodeJSListener)
     {
         this.nodeJSListener = nodeJSListener;
     }
-
     
     
     @Override
-    public void OnFinishedValidation(PilaCoin pilaCoin)
+    public void OnSoldPilaCoin(PilaCoin pilaCoin)
     {
         SerializablePilaCoin serializablePilaCoin = SerializablePilaCoin.FromPilaCoin(pilaCoin);
-        this.nodeJSListener.WriteCommand("pilacoin/finished-validation", OperationType.WRITE, serializablePilaCoin);
+        this.nodeJSListener.WriteCommand("pilacoin/sold", OperationType.WRITE, serializablePilaCoin);
     }
-
+    
 }

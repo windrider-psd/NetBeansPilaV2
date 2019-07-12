@@ -139,7 +139,7 @@ public class NodeJSListener implements MqttCallback
         try
         {
             Set<Class> classes = new HashSet<>(Arrays.asList(getClasses(packageName)));
-
+            System.out.println(classes.size());
             classes.stream().filter(c ->
             {
                 Annotation[] annotations = c.getAnnotations();
@@ -201,6 +201,7 @@ public class NodeJSListener implements MqttCallback
         {
             ex.printStackTrace();
         }
+       
     }
 
     public void WriteCommand(String commandPath, OperationType operationType, Object arg)

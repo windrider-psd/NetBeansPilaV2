@@ -11,8 +11,10 @@ import br.ufsm.csi.seguranca.node.NodeJSControllerRoute;
 import br.ufsm.csi.seguranca.node.OperationType;
 import br.ufsm.csi.seguranca.node.models.SerializablePilaCoin;
 import br.ufsm.csi.seguranca.pila.model.PilaCoin;
+import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidator;
 import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,16 +29,18 @@ public class PilaCoinController
 {
 
     @NodeJSControllerRoute(CommandPath = "pilacoin/storage", OperationType = OperationType.READ)
-    public List<SerializablePilaCoin> getStorage()
+    public List<SerializablePilaCoin> getStorage() throws IOException, ClassNotFoundException
     {
         List<SerializablePilaCoin> serializablePilaCoins = new ArrayList<>();
         
-        List<PilaCoin> pilaCoins = Arrays.asList(Main.pilaCoinStorage.GetAll());
-
+       // List<PilaCoin> pilaCoins = Arrays.asList(Main.pilaCoinStorage.GetAll());
+        Set<PilaCoin> pilaCoins = PilaDHTClientManager.getInstance().getClient().getUsuario(Main.id).getMeusPilas();
+        
         pilaCoins.forEach(pilaCoin -> {
             serializablePilaCoins.add(SerializablePilaCoin.FromPilaCoin(pilaCoin));
         });
         return serializablePilaCoins;
+       
     }
     
     @NodeJSControllerRoute(CommandPath = "pilacoin/schedule", OperationType = OperationType.READ)

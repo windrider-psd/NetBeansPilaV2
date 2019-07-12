@@ -13,5 +13,5 @@ import br.ufsm.csi.seguranca.pila.model.PilaCoin;
  */
 public interface PilaDHTClientManagerObserver
 {
-    void OnSoldPilaCoin(PilaCoin pilacoin);
+    void OnSoldPilaCoin(PilaCoin pilaCoin);
 }

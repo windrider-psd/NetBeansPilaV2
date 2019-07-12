@@ -116,15 +116,11 @@ public class Main
     
     private static void SetUpSockets() throws Exception
     {
-        ServerSocket serverSocket = new ServerSocket();
-        serverSocket.bind(new InetSocketAddress(getLocalHost(), 0));
         
         UserScout.getInstance().setId(id);
         
-        //DatagramSocket userDatagramSocket = new DatagramSocket();
         DatagramSocket broadcastSocket = new DatagramSocket(3333);
         broadcastSocket.setBroadcast(true);
-        //userDatagramSocket.bind(new InetSocketAddress(4000));
         
         MasterScout.getInstance().setPublicKey(PersonalCertificate.getInstance().getPublicKey());
         
@@ -158,8 +154,8 @@ public class Main
         {
             usuario = new Usuario();
             usuario.setChavePublica(PersonalCertificate.getInstance().getPublicKey());
-            usuario.setId(id);
-            usuario.setMeusPilas(new HashSet<>(Arrays.asList(pilaCoinStorage.GetAll())));
+            usuario.setId(id);  
+            //usuario.setMeusPilas(new HashSet<>(Arrays.asList(pilaCoinStorage.GetAll())));
             usuario.setEndereco(getLocalHost());
             
             clientManager.SetUp(id, pilaCoinStorage, usuario, udpUserBroadcaster);
