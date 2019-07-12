@@ -96,11 +96,22 @@ public class TCPClient implements Runnable
    
     public void StartListening()
     {
-        stopListening = false;
-        if(!thread.isAlive())
+        synchronized(this)
         {
-            thread = new Thread(this);
-            thread.start();
+            if(!stopListening)
+            {
+                return;
+            }
+            
+            if(thread == null || !thread.isAlive())
+            {
+                thread = new Thread(this);
+            }
+            stopListening = false;
+            if(!thread.isAlive())
+            {
+                thread.start();
+            }
         }
         
     }

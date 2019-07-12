@@ -275,7 +275,6 @@ public class NodeJSListener implements MqttCallback
 
                             respArg = route.InvokeRoute(obj);
                             responseStatus = ResponseStatus.OK;
-                            System.out.println(respArg);
                         }
                         catch (IOException | IllegalAccessException | IllegalArgumentException ex)
                         {
@@ -285,7 +284,7 @@ public class NodeJSListener implements MqttCallback
                         catch (InvocationTargetException ex)
                         {
                             responseStatus = ResponseStatus.ERROR;
-                            respArg = NodeJSCommandError.FromException((Exception) ex.getTargetException());
+                            respArg = NodeJSCommandError.FromException(ex.getTargetException());
                         }
                     }
                     else
@@ -408,7 +407,13 @@ public class NodeJSListener implements MqttCallback
                                 responseStatus = ResponseStatus.INVALID;
                             }
                         }
-                        catch (Exception ex)
+                        catch(InvocationTargetException ex)
+                        {
+                            responseStatus = ResponseStatus.ERROR;
+                            respArg = NodeJSCommandError.FromException(ex.getTargetException());
+                        }
+                        
+                        catch (IllegalAccessException | IllegalArgumentException ex)
                         {
                             responseStatus = ResponseStatus.ERROR;
                             respArg = NodeJSCommandError.FromException(ex);

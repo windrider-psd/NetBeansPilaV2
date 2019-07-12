@@ -74,14 +74,20 @@ public class UDPListener implements Runnable{
     {
         synchronized(this)
         {
+            if(!stop)
+            {
+                return;
+            }
             
-            if(!this.thread.isAlive())
+            if(thread == null || !thread.isAlive())
             {
                 thread = new Thread(this);
-                thread.start();
             }
             stop = false;
-            
+            if(!thread.isAlive())
+            {
+                thread.start();
+            }
         }
         
     }

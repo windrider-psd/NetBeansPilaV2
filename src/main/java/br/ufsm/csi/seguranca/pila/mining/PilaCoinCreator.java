@@ -49,7 +49,6 @@ public class PilaCoinCreator
             {
                 thread.start();
             }
-            
         }
     }
     
@@ -92,10 +91,10 @@ public class PilaCoinCreator
         //System.out.println("observers size : " + pilaCoinObservers.size());
         synchronized (pilaCoinObservers)
         {
-            for (PilaCoinObserver pilaCoinObserver : pilaCoinObservers)
+            pilaCoinObservers.forEach((pilaCoinObserver) ->
             {
                 pilaCoinObserver.OnCreatedPilaCoin(pilaCoinCreator, pilaCoin);
-            }
+            });
         }
 
     }
@@ -176,9 +175,5 @@ public class PilaCoinCreator
     };
 
     
-    
-    public void run()
-    {
-        
-    }
+   
 }

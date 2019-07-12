@@ -38,7 +38,6 @@ public class MasterScout implements UDPListenerObserver, UDPBroadcasterObserver{
         broadcastMessage.setEndereco(inetAddress);
         broadcastMessage.setIdOrigem(id);
         broadcastMessage.setChavePublica(publicKey);
-        System.out.println("Create id: " + broadcastMessage.getIdOrigem());
         return broadcastMessage;
     }
     

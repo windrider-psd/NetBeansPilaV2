@@ -46,13 +46,20 @@ public class TCPServer implements Runnable
         {
             synchronized(this)
             {
+                if(!stop)
+                {
+                    return;
+                }
+
+                if(thread == null || !thread.isAlive())
+                {
+                    thread = new Thread(this);
+                }
                 stop = false;
                 if(!thread.isAlive())
                 {
-                    thread = new Thread(this);
                     thread.start();
                 }
-                   
             }
         }
         

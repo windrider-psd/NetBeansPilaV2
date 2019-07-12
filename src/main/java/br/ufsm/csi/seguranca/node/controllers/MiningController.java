@@ -21,6 +21,7 @@ import br.ufsm.csi.seguranca.pila.validation.PilaCoinValidatorManager;
 public class MiningController
 {
 
+    
     @NodeJSControllerRoute(CommandPath = "mining/control", OperationType = OperationType.WRITE)
     public void ControlMining(Boolean value)
     {

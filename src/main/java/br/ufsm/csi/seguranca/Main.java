@@ -15,6 +15,7 @@ import br.ufsm.csi.seguranca.pila.network.UDPBroadcaster;
 import br.ufsm.csi.seguranca.pila.network.UDPListener;
 import br.ufsm.csi.seguranca.util.RandomString;
 import br.ufsm.csi.seguranca.pila.network.PilaDHTClientManager;
+import br.ufsm.csi.seguranca.pila.scouting.UserDatabase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,6 +63,8 @@ public class Main
         
         CreateId();
   
+        CreateUser();
+        
         CreateCertificate();
         
         SetUpSockets();
@@ -82,7 +85,7 @@ public class Main
         ValidationObserver validationObserver = new ValidationObserver(nodelistener);
         PilaCoinValidatorManager.getInstance().AddObserver(validationObserver);
        
-       
+        UserScout.getInstance().AddObserver(UserDatabase.getInstance());
         System.out.println("User Id: " + id);
         System.out.println("UDP-broadcaster: " + udpMasterBroadcaster.getDatagramSocket().getLocalAddress() + ":" + udpMasterBroadcaster.getDatagramSocket().getLocalPort());
         
@@ -137,10 +140,9 @@ public class Main
         udpMasterListener.AddObserver(UserScout.getInstance());
         udpUserBroadcaster.AddObserver(UserScout.getInstance());
         
+         udpMasterListener.Start();
         //udpUserListener.Start();
         udpUserBroadcaster.Start();    
-        
-        udpMasterListener.Start();
         udpMasterBroadcaster.Start();
     }
     
